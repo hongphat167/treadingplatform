@@ -89,11 +89,10 @@ public class UserServiceImpl implements UserService {
    *
    * @param user        user
    * @param newPassword newPassword
-   * @return user
    */
   @Override
-  public User updatePassword(User user, String newPassword) {
+  public void updatePassword(User user, String newPassword) {
     user.setPassword(newPassword);
-    return userRepository.save(user);
+    userRepository.save(user);
   }
 }

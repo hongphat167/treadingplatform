@@ -1,4 +1,4 @@
-package com.treading.coin.response;
+package com.treading.coin.controller.response;
 
 import lombok.Data;
 

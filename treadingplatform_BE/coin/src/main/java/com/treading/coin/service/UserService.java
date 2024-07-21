@@ -2,7 +2,6 @@ package com.treading.coin.service;
 
 import com.treading.coin.enums.VerificationType;
 import com.treading.coin.model.User;
-import org.springframework.stereotype.Service;
 
 
 public interface UserService {
@@ -50,7 +49,6 @@ public interface UserService {
    *
    * @param user        user
    * @param newPassword newPassword
-   * @return User
    */
-  User updatePassword(User user, String newPassword);
+  void updatePassword(User user, String newPassword);
 }
