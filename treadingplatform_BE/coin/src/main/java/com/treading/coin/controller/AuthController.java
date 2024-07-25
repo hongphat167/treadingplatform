@@ -88,6 +88,7 @@ public class AuthController {
     }
 
     AuthResponse response = new AuthResponse();
+    response.setJwt(jwt);
     response.setStatus(true);
     response.setMessage("login success");
 

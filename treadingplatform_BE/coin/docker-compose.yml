@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     image: postgres
@@ -9,7 +11,20 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - "5432:5432"
+
+  redis:
+    image: redis
+    restart: always
+    environment:
+      - REDIS_PASSWORD=password
+      - REDIS_DATABASES=postgres_redis
+      - REDIS_PORT=6379
+    volumes:
+      - /path/to/local/data:/root/redis
+      - /path/to/local/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
 
   backend:
     image: backend
@@ -23,7 +38,7 @@ services:
       DATABASE_USERNAME: postgres
       DATABASE_PASSWORD: password
     ports:
-      - 8081:8081
+      - "8081:8081"
 
 volumes:
   pgdata:
