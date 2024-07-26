@@ -5,6 +5,7 @@ import com.treading.coin.model.Coin;
 import com.treading.coin.model.Order;
 import com.treading.coin.model.OrderItem;
 import com.treading.coin.model.User;
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface OrderService {
@@ -14,6 +15,6 @@ public interface OrderService {
 
   List<Order> getAllOrderOfUser(Long userId, OrderType orderType, String assetSymbol);
 
-  Order processOrder(Coin coin, Double quantity, OrderType orderType, User user);
+  Order processOrder(Coin coin, BigDecimal quantity, OrderType orderType, User user) throws Exception;
 
 }
