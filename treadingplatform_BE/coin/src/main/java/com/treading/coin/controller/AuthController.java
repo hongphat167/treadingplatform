@@ -55,7 +55,10 @@ public class AuthController {
   @Autowired
   private VerificationCodeService verificationCodeService;
 
-  @PostMapping("/signin")
+  /**
+   * /auth/signing
+   */
+  @PostMapping("/signing")
   public ResponseEntity<AuthResponse> login(@RequestBody User user) throws MessagingException {
 
     String userName = user.getEmail();
@@ -95,6 +98,9 @@ public class AuthController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
+  /**
+   * /auth/signup
+   */
   @PostMapping("/signup")
   public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception {
 
@@ -127,6 +133,9 @@ public class AuthController {
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
+  /**
+   * /auth/signup
+   */
   @PostMapping("/two-factor/otp/{otp}")
   public ResponseEntity<AuthResponse> verifySignInOtp(@PathVariable String otp,
       @RequestParam String id)
@@ -143,6 +152,9 @@ public class AuthController {
     throw new Exception("Invalid OTP");
   }
 
+  /**
+   * /auth/user/reset-password/send-otp
+   */
   @PostMapping("/user/reset-password/send-otp")
   public ResponseEntity<AuthResponse> sendForgotPasswordOtp(
       @RequestBody ForgotPasswordTokenRequest request) throws Exception {
@@ -170,6 +182,9 @@ public class AuthController {
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
+  /**
+   * /auth/user/reset-password/verify-otp
+   */
   @PatchMapping("/user/reset-password/verify-otp")
   public ResponseEntity<ApiResponse> resetPassword(
       @RequestParam String id,

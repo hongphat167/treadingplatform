@@ -29,6 +29,9 @@ public class WalletController {
   @Autowired
   private OrderService orderService;
 
+  /**
+   * /api/wallet/get-user-wallet
+   */
   @GetMapping("/get-user-wallet")
   public ResponseEntity<Wallet> getUserWaller(@RequestHeader("Authorization") String jwt)
       throws Exception {
@@ -36,7 +39,9 @@ public class WalletController {
     Wallet wallet = walletService.getUserWallet(user);
     return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
   }
-
+  /**
+   * /api/wallet/{walletId}/transfer
+   */
   @PutMapping("/{walletId}/transfer")
   public ResponseEntity<Wallet> walletToWalletTransfer(@RequestHeader("Authorization") String jwt,
       @PathVariable Long walletId,
@@ -48,7 +53,9 @@ public class WalletController {
 
     return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
   }
-
+  /**
+   * /api/wallet/{orderId}/pay
+   */
   @PutMapping("/{orderId}/pay")
   public ResponseEntity<Wallet> payOrderPayment(@RequestHeader("Authorization") String jwt,
       @PathVariable Long orderId,

@@ -33,7 +33,11 @@ public class OrderController {
   private CoinService coinService;
 
   //  private WalletTransactionService walletTransactionService;
-  @PostMapping("pay")
+
+  /**
+   * /api/orders/pay
+   */
+  @PostMapping("/pay")
   public ResponseEntity<Order> payOrderPayment(@RequestHeader("Authorization") String jwt,
       @RequestBody OrderRequest request) throws Exception {
 
@@ -46,6 +50,9 @@ public class OrderController {
     return new ResponseEntity<>(order, HttpStatus.OK);
   }
 
+  /**
+   * /api/orders/{orderId}
+   */
   @GetMapping("/{orderId}")
   public ResponseEntity<Order> getOrderById(
       @RequestHeader("Authorization") String jwt, @PathVariable Long orderId) throws Exception {
@@ -59,7 +66,10 @@ public class OrderController {
       throw new Exception("Invalid user");
     }
   }
-
+  /**
+   * /api/orders/get-all-order
+   */
+  @GetMapping("/get-all-order")
   public ResponseEntity<List<Order>> getAllOrderForUser(
       @RequestHeader("Authorization") String jwt,
       @RequestParam(required = false) OrderType orderType,
