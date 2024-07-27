@@ -13,17 +13,29 @@ import lombok.Data;
 @Table(name = "asset")
 @Data
 public class Asset {
+
+  /**
+   * id
+   */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
-
+  private Long id;
+  /**
+   * quantity
+   */
   private BigDecimal quantity;
-
+  /**
+   * buy_price
+   */
   private BigDecimal buyPrice;
-
+  /**
+   * coin
+   */
   @ManyToOne
   private Coin coin;
-
+  /**
+   * user
+   */
   @ManyToOne
   private User user;
 }

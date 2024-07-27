@@ -33,6 +33,14 @@ public class OrderServiceImpl implements OrderService {
   @Autowired
   private AssetService assetService;
 
+  /**
+   * Create Order
+   *
+   * @param user      user
+   * @param orderItem orderItem
+   * @param orderType orderType
+   * @return Order
+   */
   @Override
   public Order createOrder(User user, OrderItem orderItem, OrderType orderType) {
     BigDecimal price = orderItem.getCoin().getCurrentPrice()
@@ -49,16 +57,40 @@ public class OrderServiceImpl implements OrderService {
     return orderRepository.save(order);
   }
 
+  /**
+   * Get Order By Id
+   *
+   * @param orderId orderId
+   * @return Order
+   * @throws Exception e
+   */
   @Override
   public Order getOrderById(Long orderId) throws Exception {
     return orderRepository.findById(orderId).orElseThrow(() -> new Exception("Order not found"));
   }
 
+  /**
+   * Get All Order Of User
+   *
+   * @param userId      userId
+   * @param orderType   orderType
+   * @param assetSymbol assetSymbol
+   * @return List<Order>
+   */
   @Override
   public List<Order> getAllOrderOfUser(Long userId, OrderType orderType, String assetSymbol) {
     return orderRepository.findByUserId(userId);
   }
 
+  /**
+   * Create Order Item
+   *
+   * @param coin      coin
+   * @param quantity  quantity
+   * @param buyPrice  buyPrice
+   * @param sellPrice sellPrice
+   * @return OrderItem
+   */
   private OrderItem createOrderItem(Coin coin, BigDecimal quantity, BigDecimal buyPrice,
       BigDecimal sellPrice) {
 
@@ -72,6 +104,15 @@ public class OrderServiceImpl implements OrderService {
 
   }
 
+  /**
+   * Buy Asset
+   *
+   * @param coin     coin
+   * @param quantity quantity
+   * @param user     user
+   * @return Order
+   * @throws Exception e
+   */
   @Transactional
   public Order buyAsset(Coin coin, BigDecimal quantity, User user) throws Exception {
     if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
@@ -89,7 +130,6 @@ public class OrderServiceImpl implements OrderService {
     order.setOrderType(OrderType.BUY);
     Order savedOrder = orderRepository.save(order);
 
-    // create asset
     Asset oldAsset = assetService.findAssetByUserIdAndCoinId(order.getUser().getId(),
         order.getOrderItem().getCoin().getId());
     if (oldAsset == null) {
@@ -100,6 +140,15 @@ public class OrderServiceImpl implements OrderService {
     return savedOrder;
   }
 
+  /**
+   * Sell Asset
+   *
+   * @param coin     coin
+   * @param quantity quantity
+   * @param user     user
+   * @return Order
+   * @throws Exception e
+   */
   @Transactional
   public Order sellAsset(Coin coin, BigDecimal quantity, User user) throws Exception {
     if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
@@ -135,6 +184,16 @@ public class OrderServiceImpl implements OrderService {
     throw new Exception("asset not found");
   }
 
+  /**
+   * Process Order
+   *
+   * @param coin      coin
+   * @param quantity  quantity
+   * @param orderType orderType
+   * @param user      user
+   * @return Order
+   * @throws Exception e
+   */
   @Override
   @Transactional
   public Order processOrder(Coin coin, BigDecimal quantity, OrderType orderType, User user)

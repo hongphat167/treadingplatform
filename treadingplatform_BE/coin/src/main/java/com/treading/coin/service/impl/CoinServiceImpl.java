@@ -50,10 +50,9 @@ public class CoinServiceImpl implements CoinService {
       ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
           String.class);
 
-      List<Coin> coinList = objectMapper.readValue(response.getBody(),
+      return objectMapper.readValue(response.getBody(),
           new TypeReference<List<Coin>>() {
           });
-      return coinList;
 
     } catch (HttpClientErrorException | HttpServerErrorException | JsonProcessingException e) {
       throw new Exception(e.getMessage());
@@ -175,6 +174,13 @@ public class CoinServiceImpl implements CoinService {
     }
   }
 
+  /**
+   * Find By Id
+   *
+   * @param coinId coinId
+   * @return Coin
+   * @throws Exception e
+   */
   @Override
   public Coin findById(String coinId) throws Exception {
     Optional<Coin> coinOptional = coinRepository.findById(coinId);
@@ -184,6 +190,13 @@ public class CoinServiceImpl implements CoinService {
     return coinOptional.get();
   }
 
+  /**
+   * Search Coin
+   *
+   * @param keyword keyword
+   * @return String
+   * @throws Exception e
+   */
   @Override
   public String searchCoin(String keyword) throws Exception {
     String url =
@@ -205,6 +218,12 @@ public class CoinServiceImpl implements CoinService {
     }
   }
 
+  /**
+   * Get Top 50 Coins By Market Rank
+   *
+   * @return String
+   * @throws Exception e
+   */
   @Override
   public String getTop50CoinsByMarketRank() throws Exception {
     String url =
@@ -226,6 +245,12 @@ public class CoinServiceImpl implements CoinService {
     }
   }
 
+  /**
+   * Get Trending Coins
+   *
+   * @return String
+   * @throws Exception e
+   */
   @Override
   public String getTrendingCoins() throws Exception {
     String url =

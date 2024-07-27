@@ -17,6 +17,12 @@ public class WalletServiceImpl implements WalletService {
   @Autowired
   private WalletRepository walletRepository;
 
+  /**
+   * Get User Wallet
+   *
+   * @param user user
+   * @return Wallet
+   */
   @Override
   public Wallet getUserWallet(User user) {
     Wallet wallet = walletRepository.findByUserId(user.getId());
@@ -27,6 +33,13 @@ public class WalletServiceImpl implements WalletService {
     return wallet;
   }
 
+  /**
+   * Add Balance
+   *
+   * @param wallet wallet
+   * @param money  money
+   * @return Wallet
+   */
   @Override
   public Wallet addBalance(Wallet wallet, Long money) {
     BigDecimal balance = wallet.getBalance();
@@ -35,12 +48,27 @@ public class WalletServiceImpl implements WalletService {
     return walletRepository.save(wallet);
   }
 
+  /**
+   * Find Wallet ById
+   *
+   * @param id id
+   * @return Wallet
+   */
   @Override
   public Wallet findWalletById(Long id) {
     Optional<Wallet> wallet = Optional.of(walletRepository.findById(id).orElseThrow());
     return wallet.get();
   }
 
+  /**
+   * Wallet To Wallet Transfer
+   *
+   * @param sender         sender
+   * @param receiverWallet receiverWallet
+   * @param amount         amount
+   * @return Wallet
+   * @throws Exception e
+   */
   @Override
   public Wallet walletToWalletTransfer(User sender, Wallet receiverWallet, Long amount)
       throws Exception {
@@ -64,7 +92,7 @@ public class WalletServiceImpl implements WalletService {
    * Pay Order Payment
    *
    * @param order order
-   * @param user user
+   * @param user  user
    * @return wallet
    * @throws Exception e
    */
@@ -72,13 +100,12 @@ public class WalletServiceImpl implements WalletService {
   public Wallet payOrderPayment(Order order, User user) throws Exception {
     Wallet wallet = getUserWallet(user);
     BigDecimal newBalance;
-    if(order.getOrderType().equals(OrderType.BUY)) {
+    if (order.getOrderType().equals(OrderType.BUY)) {
       newBalance = wallet.getBalance().subtract(order.getPrice());
-    if(newBalance.compareTo(order.getPrice())< 0) {
-      throw new Exception("Insufficient funds for this transaction");
-    }
-    }
-  else {
+      if (newBalance.compareTo(order.getPrice()) < 0) {
+        throw new Exception("Insufficient funds for this transaction");
+      }
+    } else {
       newBalance = wallet.getBalance().add(order.getPrice());
     }
     wallet.setBalance(newBalance);
