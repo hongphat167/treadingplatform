@@ -1,10 +1,13 @@
 package com.treading.coin.controller;
 
+import com.treading.coin.enums.PaymentOrderStatus;
 import com.treading.coin.model.Order;
+import com.treading.coin.model.PaymentOrder;
 import com.treading.coin.model.User;
 import com.treading.coin.model.Wallet;
 import com.treading.coin.model.WalletTransaction;
 import com.treading.coin.service.OrderService;
+import com.treading.coin.service.PaymentService;
 import com.treading.coin.service.UserService;
 import com.treading.coin.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,6 +33,9 @@ public class WalletController {
   @Autowired
   private OrderService orderService;
 
+  @Autowired
+  private PaymentService paymentService;
+
   /**
    * /api/wallet/get-user-wallet
    */
@@ -39,6 +46,7 @@ public class WalletController {
     Wallet wallet = walletService.getUserWallet(user);
     return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
   }
+
   /**
    * /api/wallet/{walletId}/transfer
    */
@@ -53,6 +61,7 @@ public class WalletController {
 
     return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
   }
+
   /**
    * /api/wallet/{orderId}/pay
    */
@@ -65,6 +74,26 @@ public class WalletController {
     Order order = orderService.getOrderById(orderId);
     Wallet wallet = walletService.payOrderPayment(order, user);
 
+    return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
+  }
+
+  /**
+   * /api/wallet/deposit
+   */
+  @GetMapping("/deposit")
+  public ResponseEntity<Wallet> addBalanceToWallet(@RequestHeader("Authorization") String jwt,
+      @RequestParam(name = "order_id") Long orderId) throws Exception {
+
+    User user = userService.findUserProfileByJwt(jwt);
+    Wallet wallet = walletService.getUserWallet(user);
+
+    PaymentOrder order = paymentService.getPaymentOrderById(orderId);
+
+    if (order.getPaymentOrderStatus().equals(PaymentOrderStatus.SUCCESS) && user.getId().equals(order.getUser().getId())) {
+      wallet = walletService.addBalance(wallet, order.getAmount());
+    } else {
+      throw new Exception("Wrong payment order");
+    }
     return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
   }
 }

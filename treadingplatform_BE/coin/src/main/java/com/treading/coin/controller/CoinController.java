@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/coins")
+@RequestMapping("/coins")
 public class CoinController {
 
   @Autowired
@@ -27,9 +27,9 @@ public class CoinController {
    * /api/coins/get-list
    */
   @GetMapping("/get-list")
-  ResponseEntity<List<Coin>> getCoinList(@RequestParam("page") int page) throws Exception {
+  ResponseEntity<List<Coin>> getCoinList(@RequestParam(required = false, name ="page") int page) throws Exception {
     List<Coin> coins = coinService.getCoinList(page);
-    return new ResponseEntity<>(coins, HttpStatus.ACCEPTED);
+    return new ResponseEntity<>(coins, HttpStatus.OK);
   }
 
   /**

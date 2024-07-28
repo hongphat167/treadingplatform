@@ -16,6 +16,7 @@ import com.treading.coin.service.ForgotPasswordService;
 import com.treading.coin.service.TwoFactorOtpService;
 import com.treading.coin.service.UserService;
 import com.treading.coin.service.VerificationCodeService;
+import com.treading.coin.service.WatchListService;
 import com.treading.coin.utils.OtpUtils;
 import jakarta.mail.MessagingException;
 import java.util.UUID;
@@ -54,6 +55,8 @@ public class AuthController {
   private ForgotPasswordService forgotPasswordService;
   @Autowired
   private VerificationCodeService verificationCodeService;
+  @Autowired
+  private WatchListService watchListService;
 
   /**
    * /auth/signing
@@ -115,6 +118,10 @@ public class AuthController {
     newUser.setEmail(user.getEmail());
     newUser.setPassword(user.getPassword());
     newUser.setFullName(user.getFullName());
+
+    User saveUser = userRepository.save(newUser);
+
+    watchListService.createWatchList(saveUser);
 
     Authentication auth = new UsernamePasswordAuthenticationToken(
         user.getEmail(),

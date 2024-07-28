@@ -24,7 +24,7 @@ public class JwtTokenValidator extends OncePerRequestFilter {
       FilterChain filterChain) throws ServletException, IOException {
     String jwt = request.getHeader(JwtConstant.JWT_HEADER);
 
-    if (jwt != null) {
+    if (jwt != null && jwt.startsWith("Bearer ")) {
       jwt = jwt.substring(7);
       try {
         SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());

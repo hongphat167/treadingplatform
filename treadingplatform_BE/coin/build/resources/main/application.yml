@@ -39,3 +39,12 @@ spring:
 
 server:
   port: 8081
+
+vnpay:
+  payUrl: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+  returnUrl: "/vnpay-payment-return"
+  tmnCode: "R4REM7PT"
+  hashSecret: "U22358B7H9M0ICNY8MNRIJVZV3P6I5GM"
+  apiUrl: "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction"
+
+
