@@ -1,4 +1,53 @@
-# Default ignored files
-/shelf/
-/workspace.xml
-treadingplatform_BE/coin/.gradle/
+# Gradle specific files
+.gradle/
+build/
+
+# IDEA specific files
+*.iml
+.idea/
+.idea_modules/
+
+# Eclipse specific files
+.classpath
+.project
+.settings/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Compiled class files
+*.class
+
+# Java artifacts
+*.jar
+*.war
+*.ear
+
+# Windows specific files
+*.exe
+*.dll
+*.bat
+*.sh
+
+# Mac specific files
+*.dmg
+*.sublime-project
+*.sublime-workspace
+
+# Generated files
+out/
+generated/
+
+# Others
+*.tmp
+*.swp
+*~.*
+*.bak
+*.orig
+*.rej
+*.swo
+*.class
