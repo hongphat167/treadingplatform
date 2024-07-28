@@ -1,11 +1,11 @@
 # Gradle specific files
-.gradle/.8.8
+.gradle/
 build/
 
-# IDEA specific files
+# IntelliJ IDEA specific files
 *.iml
 .idea/
-.idea_modules/
+*.iws
 
 # Eclipse specific files
 .classpath
