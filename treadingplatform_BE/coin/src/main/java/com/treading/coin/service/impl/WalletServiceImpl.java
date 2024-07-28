@@ -86,7 +86,7 @@ public class WalletServiceImpl implements WalletService {
     senderWallet.setBalance(senderBalance);
     walletRepository.save(senderWallet);
 
-    BigDecimal receiverBalance = receiverWallet.getBalance().add(senderBalance);
+    BigDecimal receiverBalance = receiverWallet.getBalance().add(BigDecimal.valueOf(amount));
     receiverWallet.setBalance(receiverBalance);
     walletRepository.save(receiverWallet);
     return senderWallet;

@@ -60,32 +60,7 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   @Override
-  public Boolean processPaymentOrder(PaymentOrder paymentOrder, HttpServletRequest request)
-      throws UnsupportedEncodingException {
-//    if (paymentOrder.getPaymentOrderStatus() == null) {
-//      paymentOrder.setPaymentOrderStatus(PaymentOrderStatus.PENDING);
-//    }
-//    if (paymentOrder.getPaymentOrderStatus().equals(PaymentOrderStatus.PENDING)) {
-//      if (paymentOrder.getPaymentMethod().equals(PaymentMethod.VN_PAY)) {
-//        int paymentStatus = orderReturn(request);
-//        if (paymentStatus == 1) {
-//          paymentOrder.setPaymentOrderStatus(PaymentOrderStatus.SUCCESS);
-//          paymentRepository.save(paymentOrder);
-//          return true;
-//        }
-//        paymentOrder.setPaymentOrderStatus(PaymentOrderStatus.FAILED);
-//        paymentRepository.save(paymentOrder);
-//        return false;
-//      }
-//      paymentOrder.setPaymentOrderStatus(PaymentOrderStatus.SUCCESS);
-//      paymentRepository.save(paymentOrder);
-//      return true;
-//    }
-    return true;
-  }
-
-  @Override
-  public PaymentResponse createZaloPayPayment(User user, Long amount) {
+  public PaymentResponse createMomoPayPayment(User user, Long amount) {
     return null;
   }
 

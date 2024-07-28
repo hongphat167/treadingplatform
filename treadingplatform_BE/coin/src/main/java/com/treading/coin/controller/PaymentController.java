@@ -36,15 +36,15 @@ public class PaymentController {
 
     PaymentOrder order = paymentService.createPaymentOrder(user, amount, paymentMethod);
 
-    if (paymentMethod.equals(PaymentMethod.VN_PAY)) {
+    if (paymentMethod.equals(PaymentMethod.ZALOPAY)) {
 
       paymentResponse.setPaymentUrl(
           paymentService.createVnPayPayment(user, amount, String.valueOf(order.getId()), baseUrl));
       paymentResponse.setCode("00");
       paymentResponse.setMessage("success");
       paymentResponse.setOrderId(String.valueOf(order.getId()));
-    } else {
-      // TO DO
+    } else if (paymentMethod.equals(PaymentMethod.MOMO)) {
+      // TO DO MOMO PAYMENT
       return null;
     }
     return new ResponseEntity<>(paymentResponse, HttpStatus.CREATED);
@@ -53,18 +53,25 @@ public class PaymentController {
   @GetMapping("/vnpay-payment-return")
   public ResponseEntity<PaymentResponse> paymentReturn(
       HttpServletRequest request) throws Exception {
+
     PaymentOrder order = paymentService.getPaymentOrderById(
         Long.valueOf(request.getParameter("vnp_OrderInfo")));
+
+    // Check payment success or not
     boolean paymentStatus = paymentService.orderReturn(order, request);
+
     PaymentResponse paymentResponse = new PaymentResponse();
     // Handle the payment result
     if (paymentStatus) {
+
       paymentResponse.setOrderId(request.getParameter("vnp_OrderInfo"));
       paymentResponse.setCode(request.getParameter("vnp_TransactionStatus"));
       return new ResponseEntity<>(paymentResponse, HttpStatus.OK);
     } else if (!paymentStatus) {
+
       paymentResponse.setOrderId(request.getParameter("vnp_OrderInfo"));
       paymentResponse.setCode(request.getParameter("vnp_TransactionStatus"));
+
       return new ResponseEntity<>(paymentResponse, HttpStatus.NOT_ACCEPTABLE);
     } else {
       throw new Exception("Invalid payment");

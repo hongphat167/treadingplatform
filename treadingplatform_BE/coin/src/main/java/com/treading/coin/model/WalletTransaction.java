@@ -33,7 +33,7 @@ public class WalletTransaction {
   /**
    * date
    */
-  private LocalDate date;
+  private LocalDate date = LocalDate.now();
   /**
    * transfer_id
    */

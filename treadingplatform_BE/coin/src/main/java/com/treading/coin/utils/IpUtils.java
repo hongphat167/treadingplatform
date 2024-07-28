@@ -16,10 +16,4 @@ public class IpUtils {
     return ipAddress;
   }
 
-  public static String getIpAddress(String headerIp) {
-    if (headerIp != null && !headerIp.isEmpty()) {
-      return headerIp;
-    }
-    return getIpAddress();
-  }
 }

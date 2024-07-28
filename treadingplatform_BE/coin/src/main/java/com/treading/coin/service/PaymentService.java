@@ -28,23 +28,13 @@ public interface PaymentService {
   PaymentOrder getPaymentOrderById(Long id) throws Exception;
 
   /**
-   * Process Payment Order
-   *
-   * @param paymentOrder paymentOrder
-   * @param request      request
-   * @return Boolean
-   */
-  Boolean processPaymentOrder(PaymentOrder paymentOrder, HttpServletRequest request)
-      throws UnsupportedEncodingException;
-
-  /**
    * Create Zalo Pay Payment
    *
    * @param user   user
    * @param amount amount
    * @return PaymentResponse
    */
-  PaymentResponse createZaloPayPayment(User user, Long amount);
+  PaymentResponse createMomoPayPayment(User user, Long amount);
 
   /**
    * Create Vn Pay Payment

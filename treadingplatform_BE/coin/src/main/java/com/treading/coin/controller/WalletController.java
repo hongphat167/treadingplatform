@@ -1,6 +1,7 @@
 package com.treading.coin.controller;
 
 import com.treading.coin.enums.PaymentOrderStatus;
+import com.treading.coin.enums.WalletTransactionType;
 import com.treading.coin.model.Order;
 import com.treading.coin.model.PaymentOrder;
 import com.treading.coin.model.User;
@@ -10,6 +11,7 @@ import com.treading.coin.service.OrderService;
 import com.treading.coin.service.PaymentService;
 import com.treading.coin.service.UserService;
 import com.treading.coin.service.WalletService;
+import com.treading.coin.service.WalletTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +34,10 @@ public class WalletController {
   private UserService userService;
   @Autowired
   private OrderService orderService;
-
   @Autowired
   private PaymentService paymentService;
+  @Autowired
+  private WalletTransactionService walletTransactionService;
 
   /**
    * /api/wallet/get-user-wallet
@@ -58,6 +61,10 @@ public class WalletController {
     Wallet receiverWallet = walletService.findWalletById(walletId);
     Wallet wallet = walletService.walletToWalletTransfer(senderUser, receiverWallet,
         request.getAmount());
+
+    walletTransactionService.createTransaction(wallet, WalletTransactionType.WALLET_TRANSFER,
+        String.valueOf(receiverWallet.getId()),
+        request.getPurpose(), request.getAmount());
 
     return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
   }
@@ -89,11 +96,24 @@ public class WalletController {
 
     PaymentOrder order = paymentService.getPaymentOrderById(orderId);
 
-    if (order.getPaymentOrderStatus().equals(PaymentOrderStatus.SUCCESS) && user.getId().equals(order.getUser().getId())) {
+    if (order.getPaymentOrderStatus().equals(PaymentOrderStatus.SUCCESS) && user.getId()
+        .equals(order.getUser().getId())) {
       wallet = walletService.addBalance(wallet, order.getAmount());
     } else {
       throw new Exception("Wrong payment order");
     }
     return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
+  }
+
+  @GetMapping("/transactions")
+  public ResponseEntity<WalletTransaction> getWalletTransaction(
+      @RequestHeader("Authorization") String jwt)
+      throws Exception {
+
+    User user = userService.findUserProfileByJwt(jwt);
+    Wallet wallet = walletService.getUserWallet(user);
+
+    WalletTransaction walletTransaction = walletTransactionService.getTransaction(wallet);
+    return new ResponseEntity<>(walletTransaction, HttpStatus.OK);
   }
 }
