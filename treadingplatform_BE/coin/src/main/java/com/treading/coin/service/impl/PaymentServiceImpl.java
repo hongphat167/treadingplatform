@@ -53,17 +53,42 @@ public class PaymentServiceImpl implements PaymentService {
     return paymentRepository.save(paymentOrder);
   }
 
+  /**
+   * Get Payment Order By Id
+   *
+   * @param id id
+   * @return PaymentOrder
+   * @throws Exception e
+   */
   @Override
   public PaymentOrder getPaymentOrderById(Long id) throws Exception {
     return paymentRepository.findById(id)
         .orElseThrow(() -> new Exception("Payment order not found"));
   }
 
+  /**
+   * Create Momo Pay Payment
+   *
+   * @param user   user
+   * @param amount amount
+   * @return PaymentResponse
+   */
   @Override
   public PaymentResponse createMomoPayPayment(User user, Long amount) {
+    // TO DO
     return null;
   }
 
+  /**
+   * Create Vn Pay Payment
+   *
+   * @param user      user
+   * @param amount    amount
+   * @param orderId   orderId
+   * @param urlReturn
+   * @return String
+   * @throws Exception e
+   */
   @Override
   public String createVnPayPayment(User user, Long amount,
       String orderId, String urlReturn) throws Exception {
@@ -132,6 +157,14 @@ public class PaymentServiceImpl implements PaymentService {
     return paymentUrl;
   }
 
+  /**
+   * Order Return
+   *
+   * @param paymentOrder paymentOrder
+   * @param request      request
+   * @return boolean
+   * @throws UnsupportedEncodingException e
+   */
   @Override
   public boolean orderReturn(PaymentOrder paymentOrder, HttpServletRequest request)
       throws UnsupportedEncodingException {

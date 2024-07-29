@@ -14,6 +14,16 @@ public class WalletTransactionServiceImpl implements WalletTransactionService {
   @Autowired
   private WalletTransactionRepository walletTransactionRepository;
 
+  /**
+   * Create Transaction
+   *
+   * @param wallet                wallet
+   * @param walletTransactionType walletTransactionType
+   * @param transferId            transferId
+   * @param purpose               purpose
+   * @param amount                amount
+   * @return WalletTransaction
+   */
   @Override
   public WalletTransaction createTransaction(Wallet wallet,
       WalletTransactionType walletTransactionType, String transferId, String purpose, Long amount) {
@@ -27,11 +37,19 @@ public class WalletTransactionServiceImpl implements WalletTransactionService {
     return walletTransactionRepository.save(walletTransaction);
   }
 
+  /**
+   * Get Transaction
+   *
+   * @param wallet wallet
+   * @return WalletTransaction
+   * @throws Exception e
+   */
   @Override
   public WalletTransaction getTransaction(Wallet wallet) throws Exception {
-    WalletTransaction walletTransaction = walletTransactionRepository.findByWalletId(wallet.getId());
+    WalletTransaction walletTransaction = walletTransactionRepository.findByWalletId(
+        wallet.getId());
 
-    if(walletTransaction == null) {
+    if (walletTransaction == null) {
       throw new Exception("transaction not found");
     }
     return walletTransaction;
