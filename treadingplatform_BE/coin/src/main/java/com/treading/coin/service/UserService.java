@@ -13,7 +13,7 @@ public interface UserService {
    * @return User
    * @throws Exception e
    */
-  public User findUserProfileByJwt(String jwt) throws Exception;
+  User findUserProfileByJwt(String jwt) throws Exception;
 
   /**
    * Find User By Email
@@ -22,7 +22,7 @@ public interface UserService {
    * @return User
    * @throws Exception e
    */
-  public User findUserByEmail(String email) throws Exception;
+  User findUserByEmail(String email) throws Exception;
 
   /**
    * Find User By UserId
@@ -31,7 +31,7 @@ public interface UserService {
    * @return User
    * @throws Exception e
    */
-  public User findUserByUserId(Long userId) throws Exception;
+  User findUserByUserId(Long userId) throws Exception;
 
   /**
    * Enable Two-Factor Authentication
@@ -41,7 +41,7 @@ public interface UserService {
    * @param user             user
    * @return User
    */
-  public User enableTwoFactorAuthentication(VerificationType verificationType, String sendTo,
+  User enableTwoFactorAuthentication(VerificationType verificationType, String sendTo,
       User user);
 
   /**

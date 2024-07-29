@@ -28,7 +28,7 @@ public interface PaymentService {
   PaymentOrder getPaymentOrderById(Long id) throws Exception;
 
   /**
-   * Create Zalo Pay Payment
+   * Create Momo Pay Payment
    *
    * @param user   user
    * @param amount amount
@@ -47,6 +47,14 @@ public interface PaymentService {
   String createVnPayPayment(User user, Long amount, String orderId,
       String urlReturn) throws Exception;
 
+  /**
+   * Order Return
+   *
+   * @param paymentOrder paymentOrder
+   * @param request      request
+   * @return boolean
+   * @throws UnsupportedEncodingException e
+   */
   boolean orderReturn(PaymentOrder paymentOrder, HttpServletRequest request)
       throws UnsupportedEncodingException;
 }

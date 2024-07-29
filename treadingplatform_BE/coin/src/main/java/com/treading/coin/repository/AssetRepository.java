@@ -4,7 +4,7 @@ import com.treading.coin.model.Asset;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AssetRepository  extends JpaRepository<Asset, Long> {
+public interface AssetRepository extends JpaRepository<Asset, Long> {
 
   /**
    * Find By User Id
@@ -12,7 +12,7 @@ public interface AssetRepository  extends JpaRepository<Asset, Long> {
    * @param userId userId
    * @return List<Asset>
    */
-	List<Asset> findByUserId(Long userId);
+  List<Asset> findByUserId(Long userId);
 
   /**
    * Find By User Id And Coin Id
@@ -26,11 +26,9 @@ public interface AssetRepository  extends JpaRepository<Asset, Long> {
   /**
    * Get Asset By User Id And Id
    *
-   * @param userId userid
+   * @param userId  userid
    * @param assetId assetId
    * @return Asset
    */
   Asset getAssetByUserIdAndId(Long userId, Long assetId);
-
-
 }
