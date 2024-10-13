@@ -10,16 +10,9 @@ import com.treading.coin.model.ForgotPasswordToken;
 import com.treading.coin.model.TwoFactorOTP;
 import com.treading.coin.model.User;
 import com.treading.coin.repository.UserRepository;
-import com.treading.coin.service.CustomerUserDetailService;
-import com.treading.coin.service.EmailService;
-import com.treading.coin.service.ForgotPasswordService;
-import com.treading.coin.service.TwoFactorOtpService;
-import com.treading.coin.service.UserService;
-import com.treading.coin.service.VerificationCodeService;
-import com.treading.coin.service.WatchListService;
+import com.treading.coin.service.*;
 import com.treading.coin.utils.OtpUtils;
 import jakarta.mail.MessagingException;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +21,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -111,7 +99,7 @@ public class AuthController {
 
     // Check email exits
     if (isEmailExits != null) {
-      throw new Exception("email is already used with anorther account");
+      throw new Exception("email is already used with another account");
     }
     // Create new user
     User newUser = new User();
