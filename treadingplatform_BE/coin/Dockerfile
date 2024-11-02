@@ -3,7 +3,6 @@ FROM gradle:7.3.1-jdk17-alpine as build
 WORKDIR /app
 
 # Copy only the necessary Gradle wrapper files first to leverage Docker layer caching
-COPY gradlew /app/gradlew
 
 # Make the Gradle wrapper script executable
 RUN chmod +x /app/gradlew
