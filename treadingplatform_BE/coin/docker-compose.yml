@@ -5,9 +5,9 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: treading
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
