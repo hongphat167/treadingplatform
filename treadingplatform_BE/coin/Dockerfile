@@ -7,7 +7,7 @@ RUN gradle build
 # Stage 2: Production stage
 FROM openjdk:17.0.1-jdk-slim
 WORKDIR /app
-COPY --from=build /app/build/libs/coin-0.0.1-SNAPSHOT.jar /run/coin-0.0.1-SNAPSHOT.jar
+COPY --from=build /app/build/libs/coin-0.0.1-SNAPSHOT.jar /app/coin-0.0.1-SNAPSHOT.jar
 
 EXPOSE 8080
 
