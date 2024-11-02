@@ -3,7 +3,7 @@
 FROM gradle:7.3.1-jdk17-alpine as build
 WORKDIR /app
 COPY . .
-RUN ./gradlew clean build -x test --no-daemon --stacktrace --info
+RUN chmod +x gradlew && ./gradlew clean build -x test --no-daemon --stacktrace --info
 
 ## Run Stage ##
 
