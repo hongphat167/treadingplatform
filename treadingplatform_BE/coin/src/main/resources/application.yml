@@ -3,10 +3,10 @@ spring:
     name: coin
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/treading
-    username: postgres
-    password: password
-
+    url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?sslmode=disable
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -27,18 +27,8 @@ spring:
           starttls:
             enable: true
 
-  redis:
-    host: redis
-    port: 6379
-    password: password
-    lettuce:
-      pool:
-        max-active: 8
-        max-idle: 8
-        min-idle: 0
-
 server:
-  port: 8081
+  port: 8080
 
 springdoc:
   swagger-ui:
