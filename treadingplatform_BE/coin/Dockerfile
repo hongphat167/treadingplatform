@@ -3,7 +3,7 @@
 FROM gradle:7.3.1-jdk17-alpine as build
 WORKDIR /app
 COPY . .
-RUN ./gradlew clean build -x test --no-daemon --stacktrace --info
+RUN gradle build
 
 ## Run Stage ##
 FROM openjdk:17-jdk-alpine
