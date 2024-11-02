@@ -1,14 +1,12 @@
-## Build Stage ##
-
-FROM gradle:7.3.1-jdk17-alpine as build
+# Stage 1: Build stage
+FROM gradle:8.7 AS build
 WORKDIR /app
 COPY . .
-RUN apk update && apk add --no-cache bash git libc6-compat
-RUN ./gradlew clean build -x test --no-daemon --stacktrace --info
+RUN gradle build
 
-## Run Stage ##
-FROM openjdk:17-jdk-alpine
-WORKDIR /run
+# Stage 2: Production stage
+FROM openjdk:17.0.1-jdk-slim
+WORKDIR /app
 COPY --from=build /app/build/libs/coin-0.0.1-SNAPSHOT.jar /run/coin-0.0.1-SNAPSHOT.jar
 
 EXPOSE 8080
