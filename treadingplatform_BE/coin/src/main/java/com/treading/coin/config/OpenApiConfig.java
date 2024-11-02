@@ -17,8 +17,8 @@ public class OpenApiConfig {
   public OpenAPI customOpenAPI() {
     return new OpenAPI().info(
             new Info().title("Treading Coins API Docs").version("1.0.0").description("description")
-                .license(new License().name("API License").url("http://localhost:8080/license")))
+                .license(new License().name("API License").url("https://treadingplatform-production.up.railway.app/license")))
         .servers(
-            List.of(new Server().url("http://localhost:8080")));
+            List.of(new Server().url("https://treadingplatform-production.up.railway.app")));
   }
 }
