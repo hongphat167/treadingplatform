@@ -97,7 +97,7 @@ public class ChatBotServiceImpl implements ChatBotService {
 					coin.setTotalSupply(BigDecimal.valueOf(marketData.get("total_supply").asLong()));
 				}
 			}
-
+			log.info("List of coin {}", coin);
 			return coin;
 
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
@@ -111,6 +111,7 @@ public class ChatBotServiceImpl implements ChatBotService {
 	 * @throws Exception
 	 */
 	public FunctionResponse functionResponse(String prompt) throws Exception {
+		// Tạo JSON yêu cầu
 		JSONObject jsonObject = new JSONObject()
 				.put("contents", new JSONArray()
 						.put(new JSONObject()
@@ -132,37 +133,16 @@ public class ChatBotServiceImpl implements ChatBotService {
 														.put("properties", new JSONObject()
 																.put("currencyName", new JSONObject()
 																		.put("type", "STRING")
-																		.put("description",
-																				"The currency Name, " +
-																						"id, " +
-																						"symbol.")
+																		.put("description", "The currency Name, id, symbol.")
 																)
 																.put("currencyData", new JSONObject()
 																		.put("type", "STRING")
-																		.put("description",
-																				"The currency data id, " +
-																						"symbol, " +
-																						"name, " +
-																						"image, " +
-																						"current_price, " +
-																						"market_cap, " +
-																						"market_cap_rank, " +
-																						"fully_diluted_valuation, " +
-																						"total_volume, high_24h, " +
-																						"low_24h, price_change_24h ," +
-																						"price change_percentage_24h, " +
-																						"market_cap_change_24h, " +
-																						"market_cap_change_percentage_24h, " +
-																						"circulating_supply, " +
-																						"total_supply, " +
-																						"max_supply, " +
-																						"ath, " +
-																						"ath_change_percentage, " +
-																						"ath_date, " +
-																						"atl, " +
-																						"atl_change_percentage, " +
-																						"atl_date, " +
-																						"last_updated.")
+																		.put("description", "The currency data id, symbol, name, image, current_price, " +
+																				"market_cap, market_cap_rank, fully_diluted_valuation, total_volume, high_24h, " +
+																				"low_24h, price_change_24h, price_change_percentage_24h, market_cap_change_24h, " +
+																				"market_cap_change_percentage_24h, circulating_supply, total_supply, max_supply, " +
+																				"ath, ath_change_percentage, ath_date, atl, atl_change_percentage, atl_date, last_updated."
+																		)
 																)
 														)
 														.put("required", new JSONArray()
@@ -174,43 +154,87 @@ public class ChatBotServiceImpl implements ChatBotService {
 								)
 						)
 				);
-
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
 		HttpEntity<String> requestEntity = new HttpEntity<>(jsonObject.toString(), headers);
 
-		ResponseEntity<String> response = restTemplate.postForEntity(geminiApiUrl, requestEntity, String.class);
-		String responseBody = response.getBody();
+		try {
+			// Gửi yêu cầu đến API
+			ResponseEntity<String> response = restTemplate.postForEntity(geminiApiUrl, requestEntity, String.class);
+
+			// Kiểm tra xem phản hồi có thành công không
+			if (response.getStatusCode() != HttpStatus.OK) {
+				throw new Exception("Failed to get response from API. Status: " + response.getStatusCode());
+			}
+
+			String responseBody = response.getBody();
+			JSONObject functionCall = getJsonObject(responseBody);
+
+			// Trích xuất chi tiết từ function call
+			String functionName = functionCall.getString("name");
+			log.info("functionName {}", functionName);
+
+			JSONObject args = functionCall.optJSONObject("args");
+			if (args == null) {
+				throw new Exception("Arguments not found in function call");
+			}
+
+			// Trích xuất các trường cần thiết
+			String currencyName = args.optString("currencyName", "").toLowerCase();
+			String currencyData = args.optString("currencyData", "").toLowerCase();
+
+			if (currencyName.isEmpty() || currencyData.isEmpty()) {
+				throw new Exception("Required fields 'currencyName' or 'currencyData' are missing");
+			}
+
+			log.info("responseBody {}", responseBody);
+
+			// Tạo đối tượng FunctionResponse
+			FunctionResponse functionResponse = new FunctionResponse();
+			functionResponse.setFunctionName(functionName);
+			functionResponse.setCurrencyName(currencyName);
+			functionResponse.setCurrencyData(currencyData);
+
+			return functionResponse;
+
+		} catch (Exception e) {
+			log.error("Error in functionResponse: ", e);
+			throw new Exception("Error processing function response: " + e.getMessage(), e);
+		}
+	}
+
+	private static JSONObject getJsonObject(String responseBody) throws Exception {
+		if (responseBody == null) {
+			throw new Exception("Response body is null");
+		}
 
 		JSONObject responseObject = new JSONObject(responseBody);
+
+		// Kiểm tra nếu mảng "candidates" tồn tại và không rỗng
+		if (!responseObject.has("candidates") || responseObject.getJSONArray("candidates").isEmpty()) {
+			throw new Exception("No candidates found in the response");
+		}
 
 		JSONArray candidates = responseObject.getJSONArray("candidates");
 		JSONObject candidate = candidates.getJSONObject(0);
 
-		JSONObject content = candidate.getJSONObject("content");
-		JSONArray parts = content.getJSONArray("parts");
+		JSONObject content = candidate.optJSONObject("content");
+		if (content == null) {
+			throw new Exception("Content not found in candidate");
+		}
+
+		JSONArray parts = content.optJSONArray("parts");
+		if (parts == null || parts.isEmpty()) {
+			throw new Exception("Parts array is empty in content");
+		}
+
 		JSONObject part = parts.getJSONObject(0);
-		JSONObject functionCall = part.getJSONObject("functionCall");
-
-		String functionName = functionCall.getString("name");
-		JSONObject args = functionCall.getJSONObject("args");
-
-		// Extract the name fields
-		String currencyName = args.getString("currencyName").toLowerCase();
-		String currencyData = args.getString("currencyData").toLowerCase();
-
-		System.out.println("Function Name: " + functionName);
-		System.out.println("currencyName: " + currencyName);
-		System.out.println("currencyData: " + currencyData);
-
-		System.out.println("----------" + responseBody);
-
-		FunctionResponse functionResponse = new FunctionResponse();
-		functionResponse.setFunctionName(functionName);
-		functionResponse.setCurrencyName(currencyName);
-		functionResponse.setCurrencyData(currencyData);
-		return functionResponse;
+		JSONObject functionCall = part.optJSONObject("functionCall");
+		if (functionCall == null) {
+			throw new Exception("Function call not found in part");
+		}
+		return functionCall;
 	}
 
 
