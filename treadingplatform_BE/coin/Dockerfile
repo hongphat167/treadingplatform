@@ -4,7 +4,6 @@ WORKDIR /app
 
 # Copy only the necessary Gradle wrapper files first to leverage Docker layer caching
 COPY gradlew /app/gradlew
-COPY gradle /app/gradle
 
 # Make the Gradle wrapper script executable
 RUN chmod +x /app/gradlew
