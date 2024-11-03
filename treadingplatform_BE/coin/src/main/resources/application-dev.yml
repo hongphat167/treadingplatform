@@ -1,45 +1,45 @@
-spring:
-  application:
-    name: coin
-
-  datasource:
-#    url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?sslmode=disable
-    url: jdbc:postgresql://${DATABASE_HOST:172.18.0.2}:${DATABASE_PORT:5432}/${DATABASE_NAME:treading}?sslmode=disable
-    username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:password}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: hogphat1607@gmail.com
-    password: qpfmilrxltrdorhr
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
-server:
-  port: 8080
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui/index.html
-
-vnpay:
-  payUrl: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-  returnUrl: "/vnpay-payment-return"
-  tmnCode: "R4REM7PT"
-  hashSecret: "U22358B7H9M0ICNY8MNRIJVZV3P6I5GM"
-  apiUrl: "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction"
-
-
+#spring:
+#  application:
+#    name: coin
+#
+#  datasource:
+##    url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?sslmode=disable
+#    url: jdbc:postgresql://${DATABASE_HOST:172.18.0.2}:${DATABASE_PORT:5432}/${DATABASE_NAME:treading}?sslmode=disable
+#    username: ${DATABASE_USERNAME:postgres}
+#    password: ${DATABASE_PASSWORD:password}
+#    driver-class-name: org.postgresql.Driver
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#
+#  mail:
+#    host: smtp.gmail.com
+#    port: 587
+#    username: hogphat1607@gmail.com
+#    password: qpfmilrxltrdorhr
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+#
+#server:
+#  port: 8080
+#
+#springdoc:
+#  swagger-ui:
+#    path: /swagger-ui/index.html
+#
+#vnpay:
+#  payUrl: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+#  returnUrl: "/vnpay-payment-return"
+#  tmnCode: "R4REM7PT"
+#  hashSecret: "U22358B7H9M0ICNY8MNRIJVZV3P6I5GM"
+#  apiUrl: "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction"
+#
+#
