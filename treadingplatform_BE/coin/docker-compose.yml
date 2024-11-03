@@ -11,6 +11,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5432:5432"  # Map 5432 on the host to 5432 on the container
+
 volumes:
   pgdata:

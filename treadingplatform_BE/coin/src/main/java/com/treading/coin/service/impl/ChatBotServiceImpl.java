@@ -96,6 +96,35 @@ public class ChatBotServiceImpl implements ChatBotService {
 				if (marketData.has("total_supply")) {
 					coin.setTotalSupply(BigDecimal.valueOf(marketData.get("total_supply").asLong()));
 				}
+				if (marketData.has("max_supply")) {
+					coin.setMaxSupply(BigDecimal.valueOf(marketData.get("max_supply").asLong()));
+				}
+				if (marketData.has("ath")) {
+					coin.setAth(BigDecimal.valueOf(marketData.get("ath").asLong()));
+				}
+				if (marketData.has("ath_change_percentage")) {
+					coin.setAtlChangePercentage(BigDecimal.valueOf(marketData.get("ath_change_percentage").asLong()));
+				}
+				if (marketData.has("ath_date")) {
+					coin.setAthDate(marketData.get("ath_date").asText());
+				}
+				if (marketData.has("atl")) {
+					coin.setAtl(BigDecimal.valueOf(marketData.get("atl").asLong()));
+				}
+				if (marketData.has("atl_change_percentage")) {
+					coin.setAtlChangePercentage(
+							BigDecimal.valueOf(marketData.get("atl_change_percentage").asLong())
+					);
+				}
+				if (marketData.has("atl_date")) {
+					coin.setAtlDate(marketData.get("atl_date").asText());
+				}
+				if (marketData.has("roi")) {
+					coin.setRoi(marketData.get("roi").asText());
+				}
+				if (marketData.has("last_updated")) {
+					coin.setLastUpdated(marketData.get("last_updated").asText());
+				}
 			}
 			log.info("List of coin {}", coin);
 			return coin;
@@ -106,9 +135,11 @@ public class ChatBotServiceImpl implements ChatBotService {
 	}
 
 	/**
-	 * @param prompt
-	 * @return
-	 * @throws Exception
+	 * functionResponse
+	 *
+	 * @param prompt prompt
+	 * @return FunctionResponse
+	 * @throws Exception e
 	 */
 	public FunctionResponse functionResponse(String prompt) throws Exception {
 		// Tạo JSON yêu cầu
@@ -158,6 +189,7 @@ public class ChatBotServiceImpl implements ChatBotService {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
 		HttpEntity<String> requestEntity = new HttpEntity<>(jsonObject.toString(), headers);
+		log.info("Request entity {}", requestEntity);
 
 		try {
 			// Gửi yêu cầu đến API
@@ -177,6 +209,7 @@ public class ChatBotServiceImpl implements ChatBotService {
 
 			JSONObject args = functionCall.optJSONObject("args");
 			if (args == null) {
+				log.error("Arguments not found in function call");
 				throw new Exception("Arguments not found in function call");
 			}
 
@@ -204,11 +237,32 @@ public class ChatBotServiceImpl implements ChatBotService {
 		}
 	}
 
+	/**
+	 * getJsonObject
+	 *
+	 * @param responseBody responseBody
+	 * @return JSONObject
+	 * @throws Exception e
+	 */
 	private static JSONObject getJsonObject(String responseBody) throws Exception {
 		if (responseBody == null) {
 			throw new Exception("Response body is null");
 		}
 
+		JSONArray parts = getObjects(responseBody);
+		if (parts == null || parts.isEmpty()) {
+			throw new Exception("Parts array is empty in content");
+		}
+
+		JSONObject part = parts.getJSONObject(0);
+		JSONObject functionCall = part.optJSONObject("functionCall");
+		if (functionCall == null) {
+			throw new Exception("Function call not found in part");
+		}
+		return functionCall;
+	}
+
+	private static JSONArray getObjects(String responseBody) throws Exception {
 		JSONObject responseObject = new JSONObject(responseBody);
 
 		// Kiểm tra nếu mảng "candidates" tồn tại và không rỗng
@@ -224,17 +278,7 @@ public class ChatBotServiceImpl implements ChatBotService {
 			throw new Exception("Content not found in candidate");
 		}
 
-		JSONArray parts = content.optJSONArray("parts");
-		if (parts == null || parts.isEmpty()) {
-			throw new Exception("Parts array is empty in content");
-		}
-
-		JSONObject part = parts.getJSONObject(0);
-		JSONObject functionCall = part.optJSONObject("functionCall");
-		if (functionCall == null) {
-			throw new Exception("Function call not found in part");
-		}
-		return functionCall;
+		return content.optJSONArray("parts");
 	}
 
 
@@ -243,8 +287,6 @@ public class ChatBotServiceImpl implements ChatBotService {
 
 		FunctionResponse rp = functionResponse(prompt);
 		Coin apiCoinResponse = getCoin(rp.getCurrencyName());
-
-		System.out.println("=====================" + apiCoinResponse);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -334,7 +376,6 @@ public class ChatBotServiceImpl implements ChatBotService {
 		JSONObject content = candidates.getJSONObject(0).getJSONObject("content");
 		JSONArray parts = content.getJSONArray("parts");
 		String text = parts.getJSONObject(0).getString("text");
-		System.out.println(text);
 
 		ApiResponse apiResponse = new ApiResponse();
 		apiResponse.setMessage(text);

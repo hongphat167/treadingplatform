@@ -7,9 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.treading.coin.model.Coin;
 import com.treading.coin.repository.CoinRepository;
 import com.treading.coin.service.CoinService;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,254 +24,284 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@Slf4j
 public class CoinServiceImpl implements CoinService {
 
-  @Autowired
-  private CoinRepository coinRepository;
-  @Autowired
-  private ObjectMapper objectMapper;
+	@Autowired
+	private CoinRepository coinRepository;
+	@Autowired
+	private ObjectMapper objectMapper;
 
-  /**
-   * Get Coin List
-   *
-   * @param page page
-   * @return coinList
-   * @throws Exception e
-   */
-  @Override
-  public List<Coin> getCoinList(int page) throws Exception {
+	/**
+	 * Get Coin List
+	 *
+	 * @param page page
+	 * @return coinList
+	 * @throws Exception e
+	 */
+	@Override
+	public List<Coin> getCoinList(int page) throws Exception {
 
-    String url =
-        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=10&page=" + page;
+		String url =
+				"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=10&page=" + page;
 
-    RestTemplate restTemplate = new RestTemplate();
-    try {
-      HttpHeaders headers = new HttpHeaders();
+		RestTemplate restTemplate = new RestTemplate();
+		try {
+			HttpHeaders headers = new HttpHeaders();
 
-      HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+			HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
-      ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
-          String.class);
+			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
+					String.class);
 
-      return objectMapper.readValue(response.getBody(),
-          new TypeReference<List<Coin>>() {
-          });
+			return objectMapper.readValue(response.getBody(),
+					new TypeReference<List<Coin>>() {
+					});
 
-    } catch (HttpClientErrorException | HttpServerErrorException | JsonProcessingException e) {
-      throw new Exception(e.getMessage());
-    }
-  }
+		} catch (HttpClientErrorException | HttpServerErrorException | JsonProcessingException e) {
+			throw new Exception(e.getMessage());
+		}
+	}
 
-  /**
-   * Get Market Chart
-   *
-   * @param coinId coinId
-   * @param days   days
-   * @return response
-   * @throws Exception e
-   */
-  @Override
-  public String getMarketChart(String coinId, int days) throws Exception {
-    String url =
-        "https://api.coingecko.com/api/v3/coins/" + coinId + "/market_chart?vs_currency=usd&days="
-            + days;
+	/**
+	 * Get Market Chart
+	 *
+	 * @param coinId coinId
+	 * @param days   days
+	 * @return response
+	 * @throws Exception e
+	 */
+	@Override
+	public String getMarketChart(String coinId, int days) throws Exception {
+		String url =
+				"https://api.coingecko.com/api/v3/coins/" + coinId + "/market_chart?vs_currency=usd&days="
+						+ days;
 
-    RestTemplate restTemplate = new RestTemplate();
-    try {
-      HttpHeaders headers = new HttpHeaders();
+		RestTemplate restTemplate = new RestTemplate();
+		try {
+			HttpHeaders headers = new HttpHeaders();
 
-      HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+			HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
-      ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
-          String.class);
+			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
+					String.class);
 
-      return response.getBody();
+			return response.getBody();
 
-    } catch (HttpClientErrorException | HttpServerErrorException e) {
-      throw new Exception(e.getMessage());
-    }
-  }
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			throw new Exception(e.getMessage());
+		}
+	}
 
-  /**
-   * Get Coin Details
-   *
-   * @param coinId coinId
-   * @return response
-   * @throws Exception e
-   */
-  @Override
-  public String getCoinDetails(String coinId) throws Exception {
-    String url = "https://api.coingecko.com/api/v3/coins/" + coinId;
+	/**
+	 * Get Coin Details
+	 *
+	 * @param coinId coinId
+	 * @return response
+	 * @throws Exception e
+	 */
+	@Override
+	public String getCoinDetails(String coinId) throws Exception {
+		String url = "https://api.coingecko.com/api/v3/coins/" + coinId;
 
-    RestTemplate restTemplate = new RestTemplate();
-    try {
-      HttpHeaders headers = new HttpHeaders();
+		RestTemplate restTemplate = new RestTemplate();
+		try {
+			HttpHeaders headers = new HttpHeaders();
 
-      HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+			HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
-      ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
-          String.class);
+			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
+					String.class);
 
-      JsonNode jsonNode = objectMapper.readTree(response.getBody());
-      Coin coin = new Coin();
-      if (jsonNode.has("id")) {
-        coin.setId(jsonNode.get("id").asText());
-      }
-      if (jsonNode.has("name")) {
-        coin.setName(jsonNode.get("name").asText());
-      }
-      if (jsonNode.has("symbol")) {
-        coin.setSymbol(jsonNode.get("symbol").asText());
-      }
-      if (jsonNode.has("image") && jsonNode.get("image").has("large")) {
-        coin.setImage(jsonNode.get("image").get("large").asText());
-      }
+			JsonNode jsonNode = objectMapper.readTree(response.getBody());
+			Coin coin = new Coin();
+			if (jsonNode.has("id")) {
+				coin.setId(jsonNode.get("id").asText());
+			}
+			if (jsonNode.has("name")) {
+				coin.setName(jsonNode.get("name").asText());
+			}
+			if (jsonNode.has("symbol")) {
+				coin.setSymbol(jsonNode.get("symbol").asText());
+			}
+			if (jsonNode.has("image") && jsonNode.get("image").has("large")) {
+				coin.setImage(jsonNode.get("image").get("large").asText());
+			}
 
-      JsonNode marketData = jsonNode.get("market_data");
-      if (marketData != null) {
-        if (marketData.has("current_price") && marketData.get("current_price").has("usd")) {
-          coin.setCurrentPrice(
-              BigDecimal.valueOf(marketData.get("current_price").get("usd").asDouble()));
-        }
-        if (marketData.has("market_cap") && marketData.get("market_cap").has("usd")) {
-          coin.setMarketCap(BigDecimal.valueOf(marketData.get("market_cap").get("usd").asLong()));
-        }
-        if (marketData.has("market_cap_rank")) {
-          coin.setMarketCapRank(marketData.get("market_cap_rank").asInt());
-        }
-        if (marketData.has("total_volume") && marketData.get("total_volume").has("usd")) {
-          coin.setTotalVolume(
-              BigDecimal.valueOf(marketData.get("total_volume").get("usd").asDouble()));
-        }
-        if (marketData.has("high_24h") && marketData.get("high_24h").has("usd")) {
-          coin.setHigh24h(BigDecimal.valueOf(marketData.get("high_24h").get("usd").asDouble()));
-        }
-        if (marketData.has("low_24h") && marketData.get("low_24h").has("usd")) {
-          coin.setLow24h(BigDecimal.valueOf(marketData.get("low_24h").get("usd").asDouble()));
-        }
-        if (marketData.has("price_change_24h")) {
-          coin.setPriceChange24h(marketData.get("price_change_24h").asDouble());
-        }
-        if (marketData.has("price_change_percentage_24h")) {
-          coin.setPriceChangePercentage24h(
-              marketData.get("price_change_percentage_24h").asDouble());
-        }
-        if (marketData.has("market_cap_change_24h")) {
-          coin.setMarketCapChange24h(
-              BigDecimal.valueOf(marketData.get("market_cap_change_24h").asLong()));
-        }
-        if (marketData.has("market_cap_change_percentage_24h")) {
-          coin.setMarketCapChangePercentage24h(
-              BigDecimal.valueOf(marketData.get("market_cap_change_percentage_24h").asDouble()));
-        }
-        if (marketData.has("total_supply")) {
-          coin.setTotalSupply(BigDecimal.valueOf(marketData.get("total_supply").asLong()));
-        }
-      }
+			JsonNode marketData = jsonNode.get("market_data");
+			if (marketData != null) {
+				if (marketData.has("current_price") && marketData.get("current_price").has("usd")) {
+					coin.setCurrentPrice(
+							BigDecimal.valueOf(marketData.get("current_price").get("usd").asDouble()));
+				}
+				if (marketData.has("market_cap") && marketData.get("market_cap").has("usd")) {
+					coin.setMarketCap(BigDecimal.valueOf(marketData.get("market_cap").get("usd").asLong()));
+				}
+				if (marketData.has("market_cap_rank")) {
+					coin.setMarketCapRank(marketData.get("market_cap_rank").asInt());
+				}
+				if (marketData.has("total_volume") && marketData.get("total_volume").has("usd")) {
+					coin.setTotalVolume(
+							BigDecimal.valueOf(marketData.get("total_volume").get("usd").asDouble()));
+				}
+				if (marketData.has("high_24h") && marketData.get("high_24h").has("usd")) {
+					coin.setHigh24h(BigDecimal.valueOf(marketData.get("high_24h").get("usd").asDouble()));
+				}
+				if (marketData.has("low_24h") && marketData.get("low_24h").has("usd")) {
+					coin.setLow24h(BigDecimal.valueOf(marketData.get("low_24h").get("usd").asDouble()));
+				}
+				if (marketData.has("price_change_24h")) {
+					coin.setPriceChange24h(marketData.get("price_change_24h").asDouble());
+				}
+				if (marketData.has("price_change_percentage_24h")) {
+					coin.setPriceChangePercentage24h(
+							marketData.get("price_change_percentage_24h").asDouble());
+				}
+				if (marketData.has("market_cap_change_24h")) {
+					coin.setMarketCapChange24h(
+							BigDecimal.valueOf(marketData.get("market_cap_change_24h").asLong()));
+				}
+				if (marketData.has("market_cap_change_percentage_24h")) {
+					coin.setMarketCapChangePercentage24h(
+							BigDecimal.valueOf(marketData.get("market_cap_change_percentage_24h").asDouble()));
+				}
+				if (marketData.has("total_supply")) {
+					coin.setTotalSupply(BigDecimal.valueOf(marketData.get("total_supply").asLong()));
+				}
+				if (marketData.has("max_supply")) {
+					coin.setMaxSupply(BigDecimal.valueOf(marketData.get("max_supply").asLong()));
+				}
+				if (marketData.has("ath")) {
+					coin.setAth(BigDecimal.valueOf(marketData.get("ath").asLong()));
+				}
+				if (marketData.has("ath_change_percentage")) {
+					coin.setAtlChangePercentage(BigDecimal.valueOf(marketData.get("ath_change_percentage").asLong()));
+				}
+				if (marketData.has("ath_date")) {
+					coin.setAthDate(marketData.get("ath_date").asText());
+				}
+				if (marketData.has("atl")) {
+					coin.setAtl(BigDecimal.valueOf(marketData.get("atl").asLong()));
+				}
+				if (marketData.has("atl_change_percentage")) {
+					coin.setAtlChangePercentage(
+							BigDecimal.valueOf(marketData.get("atl_change_percentage").asLong())
+					);
+				}
+				if (marketData.has("atl_date")) {
+					coin.setAtlDate(marketData.get("atl_date").asText());
+				}
+				if (marketData.has("roi")) {
+					coin.setRoi(marketData.get("roi").asText());
+				}
+				if (marketData.has("last_updated")) {
+					coin.setLastUpdated(marketData.get("last_updated").asText());
+				}
+			}
+			log.info("coin detail {}", coin);
+			coinRepository.save(coin);
+			return response.getBody();
 
-      coinRepository.save(coin);
-      return response.getBody();
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			throw new Exception(e.getMessage());
+		}
+	}
 
-    } catch (HttpClientErrorException | HttpServerErrorException e) {
-      throw new Exception(e.getMessage());
-    }
-  }
+	/**
+	 * Find By Id
+	 *
+	 * @param coinId coinId
+	 * @return Coin
+	 * @throws Exception e
+	 */
+	@Override
+	public Coin findById(String coinId) throws Exception {
+		Optional<Coin> coinOptional = coinRepository.findById(coinId);
+		if (coinOptional.isEmpty()) {
+			throw new Exception("Coin not found");
+		}
+		return coinOptional.get();
+	}
 
-  /**
-   * Find By Id
-   *
-   * @param coinId coinId
-   * @return Coin
-   * @throws Exception e
-   */
-  @Override
-  public Coin findById(String coinId) throws Exception {
-    Optional<Coin> coinOptional = coinRepository.findById(coinId);
-    if (coinOptional.isEmpty()) {
-      throw new Exception("Coin not found");
-    }
-    return coinOptional.get();
-  }
+	/**
+	 * Search Coin
+	 *
+	 * @param keyword keyword
+	 * @return String
+	 * @throws Exception e
+	 */
+	@Override
+	public String searchCoin(String keyword) throws Exception {
+		String url =
+				"https://api.coingecko.com/api/v3/search?query=" + keyword;
 
-  /**
-   * Search Coin
-   *
-   * @param keyword keyword
-   * @return String
-   * @throws Exception e
-   */
-  @Override
-  public String searchCoin(String keyword) throws Exception {
-    String url =
-        "https://api.coingecko.com/api/v3/search?query=" + keyword;
+		RestTemplate restTemplate = new RestTemplate();
+		try {
+			HttpHeaders headers = new HttpHeaders();
 
-    RestTemplate restTemplate = new RestTemplate();
-    try {
-      HttpHeaders headers = new HttpHeaders();
+			HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
-      HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
+					String.class);
 
-      ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
-          String.class);
+			return response.getBody();
 
-      return response.getBody();
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			throw new Exception(e.getMessage());
+		}
+	}
 
-    } catch (HttpClientErrorException | HttpServerErrorException e) {
-      throw new Exception(e.getMessage());
-    }
-  }
+	/**
+	 * Get Top 50 Coins By Market Rank
+	 *
+	 * @return String
+	 * @throws Exception e
+	 */
+	@Override
+	public String getTop50CoinsByMarketRank() throws Exception {
+		String url =
+				"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=50&page=1";
 
-  /**
-   * Get Top 50 Coins By Market Rank
-   *
-   * @return String
-   * @throws Exception e
-   */
-  @Override
-  public String getTop50CoinsByMarketRank() throws Exception {
-    String url =
-        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=50&page=1";
+		RestTemplate restTemplate = new RestTemplate();
+		try {
+			HttpHeaders headers = new HttpHeaders();
 
-    RestTemplate restTemplate = new RestTemplate();
-    try {
-      HttpHeaders headers = new HttpHeaders();
+			HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
-      HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
+					String.class);
 
-      ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
-          String.class);
+			return response.getBody();
 
-      return response.getBody();
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			throw new Exception(e.getMessage());
+		}
+	}
 
-    } catch (HttpClientErrorException | HttpServerErrorException e) {
-      throw new Exception(e.getMessage());
-    }
-  }
+	/**
+	 * Get Trending Coins
+	 *
+	 * @return String
+	 * @throws Exception e
+	 */
+	@Override
+	public String getTrendingCoins() throws Exception {
+		String url =
+				"https://api.coingecko.com/api/v3/search/trending";
 
-  /**
-   * Get Trending Coins
-   *
-   * @return String
-   * @throws Exception e
-   */
-  @Override
-  public String getTrendingCoins() throws Exception {
-    String url =
-        "https://api.coingecko.com/api/v3/search/trending";
+		RestTemplate restTemplate = new RestTemplate();
+		try {
+			HttpHeaders headers = new HttpHeaders();
 
-    RestTemplate restTemplate = new RestTemplate();
-    try {
-      HttpHeaders headers = new HttpHeaders();
+			HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
-      HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
+					String.class);
 
-      ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity,
-          String.class);
+			return response.getBody();
 
-      return response.getBody();
-
-    } catch (HttpClientErrorException | HttpServerErrorException e) {
-      throw new Exception(e.getMessage());
-    }
-  }
+		} catch (HttpClientErrorException | HttpServerErrorException e) {
+			throw new Exception(e.getMessage());
+		}
+	}
 }
