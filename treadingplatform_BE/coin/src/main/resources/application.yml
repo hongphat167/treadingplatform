@@ -3,6 +3,7 @@ spring:
     name: coin
 
   datasource:
+    #    url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?sslmode=disable
     url: jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
@@ -40,5 +41,3 @@ vnpay:
   tmnCode: "R4REM7PT"
   hashSecret: "U22358B7H9M0ICNY8MNRIJVZV3P6I5GM"
   apiUrl: "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction"
-
-
