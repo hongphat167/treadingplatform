@@ -30,13 +30,13 @@ public class PaymentController {
 
     User user = userService.findUserProfileByJwt(jwt);
 
-    String baseUrl = "http://localhost:8081";
+    String baseUrl = "https://treadingplatform-production.up.railway.app";
 
     PaymentResponse paymentResponse = new PaymentResponse();
 
     PaymentOrder order = paymentService.createPaymentOrder(user, amount, paymentMethod);
 
-    if (paymentMethod.equals(PaymentMethod.ZALOPAY)) {
+    if (paymentMethod.equals(PaymentMethod.VNPAY)) {
 
       paymentResponse.setPaymentUrl(
           paymentService.createVnPayPayment(user, amount, String.valueOf(order.getId()), baseUrl));
