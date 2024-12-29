@@ -4,38 +4,43 @@ import com.treading.coin.model.Coin;
 import com.treading.coin.model.User;
 import com.treading.coin.model.WatchList;
 
+/**
+ * The interface Watch list service.
+ */
 public interface WatchListService {
 
-  /**
-   * Find User Watch List
-   *
-   * @param userId userId
-   * @return WatchList
-   */
-  WatchList findUserWatchList(Long userId) throws Exception;
+	/**
+	 * Find user watch list watch list.
+	 *
+	 * @param userId the user id
+	 * @return the watch list
+	 * @throws Exception the exception
+	 */
+	WatchList findUserWatchList(Long userId) throws Exception;
 
-  /**
-   * Create Watch List
-   *
-   * @param user user
-   * @return WatchList
-   */
-  WatchList createWatchList(User user);
+	/**
+	 * Create watch list watch list.
+	 *
+	 * @param user the user
+	 */
+	void createWatchList(User user);
 
-  /**
-   * Find By Id
-   *
-   * @param id id
-   * @return WatchList
-   */
-  WatchList findById(Long id) throws Exception;
+	/**
+	 * Find by id watch list.
+	 *
+	 * @param id the id
+	 * @return the watch list
+	 * @throws Exception the exception
+	 */
+	WatchList findById(Long id) throws Exception;
 
-  /**
-   * Add Item To Watch List
-   *
-   * @param coin coin
-   * @param user user
-   * @return Coin
-   */
-  Coin addItemToWatchList(Coin coin, User user) throws Exception;
+	/**
+	 * Add item to watch list coin.
+	 *
+	 * @param coin the coin
+	 * @param user the user
+	 * @return the coin
+	 * @throws Exception the exception
+	 */
+	Coin addItemToWatchList(Coin coin, User user) throws Exception;
 }

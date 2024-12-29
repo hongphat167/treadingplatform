@@ -1,6 +1,15 @@
 package com.treading.coin.enums;
 
+/**
+ * The enum Verification type.
+ */
 public enum VerificationType {
-  MOBILE,
-  EMAIL
+	/**
+	 * Mobile verification type.
+	 */
+	MOBILE,
+	/**
+	 * Email verification type.
+	 */
+	EMAIL
 }

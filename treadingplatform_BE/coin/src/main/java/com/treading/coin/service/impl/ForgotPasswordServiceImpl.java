@@ -5,70 +5,50 @@ import com.treading.coin.model.ForgotPasswordToken;
 import com.treading.coin.model.User;
 import com.treading.coin.repository.ForgotPasswordRepository;
 import com.treading.coin.service.ForgotPasswordService;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+/**
+ * The type Forgot password service.
+ */
 @Service
 public class ForgotPasswordServiceImpl implements ForgotPasswordService {
 
-  @Autowired
-  private ForgotPasswordRepository forgotPasswordRepository;
 
-  /**
-   * Create Token
-   *
-   * @param user             user
-   * @param id               id
-   * @param otp              otp
-   * @param verificationType verificationType
-   * @param sendTo           sendTo
-   * @return token
-   */
-  @Override
-  public ForgotPasswordToken createToken(User user, String id, String otp,
-      VerificationType verificationType, String sendTo) {
+	private final ForgotPasswordRepository forgotPasswordRepository;
 
-    ForgotPasswordToken token = new ForgotPasswordToken();
-    token.setUser(user);
-    token.setSendTo(sendTo);
-    token.setVerificationType(verificationType);
-    token.setOtp(otp);
-    token.setId(id);
-    return forgotPasswordRepository.save(token);
-  }
+	protected ForgotPasswordServiceImpl(ForgotPasswordRepository forgotPasswordRepository) {
+		this.forgotPasswordRepository = forgotPasswordRepository;
+	}
 
-  /**
-   * Find By Id
-   *
-   * @param id id
-   * @return token
-   */
-  @Override
-  public ForgotPasswordToken findById(String id) {
+	@Override
+	public ForgotPasswordToken createToken(User user, String id, String otp,
+	                                       VerificationType verificationType, String sendTo) {
 
-    Optional<ForgotPasswordToken> token = forgotPasswordRepository.findById(id);
-    return token.orElse(null);
-  }
+		ForgotPasswordToken token = new ForgotPasswordToken();
+		token.setUser(user);
+		token.setSendTo(sendTo);
+		token.setVerificationType(verificationType);
+		token.setOtp(otp);
+		token.setId(id);
+		return forgotPasswordRepository.save(token);
+	}
 
-  /**
-   * Find By User
-   *
-   * @param userId userId
-   * @return userId
-   */
-  @Override
-  public ForgotPasswordToken findByUser(Long userId) {
-    return forgotPasswordRepository.findByUserId(userId);
-  }
+	@Override
+	public ForgotPasswordToken findById(String id) {
 
-  /**
-   * Delete Token
-   *
-   * @param forgotPasswordToken forgotPasswordToken
-   */
-  @Override
-  public void deleteToken(ForgotPasswordToken forgotPasswordToken) {
-    forgotPasswordRepository.delete(forgotPasswordToken);
-  }
+		Optional<ForgotPasswordToken> token = forgotPasswordRepository.findById(id);
+		return token.orElse(null);
+	}
+
+	@Override
+	public ForgotPasswordToken findByUser(Long userId) {
+		return forgotPasswordRepository.findByUserId(userId);
+	}
+
+	@Override
+	public void deleteToken(ForgotPasswordToken forgotPasswordToken) {
+		forgotPasswordRepository.delete(forgotPasswordToken);
+	}
 }

@@ -9,7 +9,6 @@ import com.treading.coin.service.ChatBotService;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -18,19 +17,38 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 
+/**
+ * The type Chat bot service.
+ */
 @Service
 @Slf4j
 public class ChatBotServiceImpl implements ChatBotService {
 
-	@Autowired
-	private ObjectMapper objectMapper;
+
+	private final ObjectMapper objectMapper;
 
 	private final String apiGeminiKey = "AIzaSyDnEd8Vq698HHdHqwdbgJk1spybNjrfPwk";
 	private final String geminiApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + apiGeminiKey;
 
 	private final RestTemplate restTemplate = new RestTemplate();
 
+	/**
+	 * Instantiates a new Chat bot service.
+	 *
+	 * @param objectMapper the object mapper
+	 */
+	protected ChatBotServiceImpl(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+	}
 
+
+	/**
+	 * Gets coin.
+	 *
+	 * @param currencyName the currency name
+	 * @return the coin
+	 * @throws Exception the exception
+	 */
 	public Coin getCoin(String currencyName) throws Exception {
 		String url = "https://api.coingecko.com/api/v3/coins/" + currencyName;
 		try {
@@ -135,11 +153,11 @@ public class ChatBotServiceImpl implements ChatBotService {
 	}
 
 	/**
-	 * functionResponse
+	 * Function response function response.
 	 *
-	 * @param prompt prompt
-	 * @return FunctionResponse
-	 * @throws Exception e
+	 * @param prompt the prompt
+	 * @return the function response
+	 * @throws Exception the exception
 	 */
 	public FunctionResponse functionResponse(String prompt) throws Exception {
 		// Tạo JSON yêu cầu
@@ -237,13 +255,6 @@ public class ChatBotServiceImpl implements ChatBotService {
 		}
 	}
 
-	/**
-	 * getJsonObject
-	 *
-	 * @param responseBody responseBody
-	 * @return JSONObject
-	 * @throws Exception e
-	 */
 	private static JSONObject getJsonObject(String responseBody) throws Exception {
 		if (responseBody == null) {
 			throw new Exception("Response body is null");

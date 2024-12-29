@@ -5,109 +5,73 @@ import com.treading.coin.model.Coin;
 import com.treading.coin.model.User;
 import com.treading.coin.repository.AssetRepository;
 import com.treading.coin.service.AssetService;
-import java.math.BigDecimal;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+/**
+ * The type Asset service.
+ */
 @Service
 public class AssetServiceImpl implements AssetService {
 
-  @Autowired
-  private AssetRepository assetRepository;
+	private final AssetRepository assetRepository;
 
-  /**
-   * Create Asset
-   *
-   * @param user     user
-   * @param coin     coin
-   * @param quantity quantity
-   */
-  @Override
-  public void createAsset(User user, Coin coin, BigDecimal quantity) {
+	/**
+	 * Instantiates a new Asset service.
+	 *
+	 * @param assetRepository the asset repository
+	 */
+	protected AssetServiceImpl(AssetRepository assetRepository) {
+		this.assetRepository = assetRepository;
+	}
 
-    Asset asset = new Asset();
-    asset.setUser(user);
-    asset.setCoin(coin);
-    asset.setQuantity(quantity);
-    asset.setBuyPrice(coin.getCurrentPrice());
+	@Override
+	public void createAsset(User user, Coin coin, BigDecimal quantity) {
 
-    assetRepository.save(asset);
-  }
+		Asset asset = new Asset();
+		asset.setUser(user);
+		asset.setCoin(coin);
+		asset.setQuantity(quantity);
+		asset.setBuyPrice(coin.getCurrentPrice());
 
-  /**
-   * Get Asset By Id
-   *
-   * @param assetId assetId
-   * @return Asset
-   * @throws Exception e
-   */
-  @Override
-  public Asset getAssetById(Long assetId) throws Exception {
+		assetRepository.save(asset);
+	}
 
-    return assetRepository.findById(assetId).orElseThrow(() -> new Exception("asset not found"));
-  }
+	@Override
+	public Asset getAssetById(Long assetId) throws Exception {
 
-  /**
-   * Get Asset By User Id And Id
-   *
-   * @param userId  userId
-   * @param assetId assetId
-   * @return Asset
-   */
-  @Override
-  public Asset getAssetByUserIdAndId(Long userId, Long assetId) {
+		return assetRepository.findById(assetId).orElseThrow(() -> new Exception("asset not found"));
+	}
 
-    return assetRepository.getAssetByUserIdAndId(userId, assetId);
-  }
+	@Override
+	public Asset getAssetByUserIdAndId(Long userId, Long assetId) {
 
-  /**
-   * Get Users Assets
-   *
-   * @param userId userId
-   * @return List<Asset>
-   */
-  @Override
-  public List<Asset> getUsersAssets(Long userId) {
+		return assetRepository.getAssetByUserIdAndId(userId, assetId);
+	}
 
-    return assetRepository.findByUserId(userId);
-  }
+	@Override
+	public List<Asset> getUsersAssets(Long userId) {
 
-  /**
-   * Update Asset
-   *
-   * @param assetId  assetId
-   * @param quantity quantity
-   * @return Asset
-   * @throws Exception e
-   */
-  @Override
-  public Asset updateAsset(Long assetId, BigDecimal quantity) throws Exception {
-    Asset oldAsset = getAssetById(assetId);
-    oldAsset.setQuantity(quantity.add(oldAsset.getQuantity()));
-    return assetRepository.save(oldAsset);
-  }
+		return assetRepository.findByUserId(userId);
+	}
 
-  /**
-   * Find Asset By User Id And Coin Id
-   *
-   * @param userId userId
-   * @param coinId coinId
-   * @return Asset
-   */
-  @Override
-  public Asset findAssetByUserIdAndCoinId(Long userId, String coinId) {
+	@Override
+	public Asset updateAsset(Long assetId, BigDecimal quantity) throws Exception {
+		Asset oldAsset = getAssetById(assetId);
+		oldAsset.setQuantity(quantity.add(oldAsset.getQuantity()));
+		return assetRepository.save(oldAsset);
+	}
 
-    return assetRepository.findByUserIdAndCoinId(userId, coinId);
-  }
+	@Override
+	public Asset findAssetByUserIdAndCoinId(Long userId, String coinId) {
 
-  /**
-   * Delete Asset
-   *
-   * @param assetId assetId
-   */
-  @Override
-  public void deleteAsset(Long assetId) {
-    assetRepository.deleteById(assetId);
-  }
+		return assetRepository.findByUserIdAndCoinId(userId, coinId);
+	}
+
+	@Override
+	public void deleteAsset(Long assetId) {
+		assetRepository.deleteById(assetId);
+	}
 }

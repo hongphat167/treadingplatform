@@ -7,29 +7,20 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+/**
+ * The type Two factor otp.
+ */
 @Entity
 @Table(name = "two_factor")
 @Data
 public class TwoFactorOTP {
 
-  /**
-   * id
-   */
-  @Id
-  private String id;
-  /**
-   * otp
-   */
-  private String otp;
-  /**
-   * user
-   */
-  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-  @OneToOne
-  private User user;
-  /**
-   * jwt
-   */
-  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-  private String jwt;
+	@Id
+	private String id;
+	private String otp;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@OneToOne
+	private User user;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	private String jwt;
 }

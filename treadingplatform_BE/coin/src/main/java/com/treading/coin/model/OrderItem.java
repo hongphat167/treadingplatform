@@ -1,48 +1,28 @@
 package com.treading.coin.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import java.math.BigDecimal;
+import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
+/**
+ * The type Order item.
+ */
 @Entity
 @Table(name = "order_item")
 @Data
 public class OrderItem {
 
-  /**
-   * id
-   */
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
-  /**
-   * quantity
-   */
-  private BigDecimal quantity;
-  /**
-   * coin
-   */
-  @ManyToOne
-  private Coin coin;
-  /**
-   * by_price
-   */
-  private BigDecimal buyPrice;
-  /**
-   * sell_price
-   */
-  private BigDecimal sellPrice;
-  /**
-   * order
-   */
-  @JsonIgnore
-  @OneToOne
-  private Order order;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
+	private BigDecimal quantity;
+	@ManyToOne
+	private Coin coin;
+	private BigDecimal buyPrice;
+	private BigDecimal sellPrice;
+	@JsonIgnore
+	@OneToOne
+	private Order order;
 }

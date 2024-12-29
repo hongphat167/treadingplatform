@@ -1,6 +1,15 @@
 package com.treading.coin.enums;
 
+/**
+ * The enum Order type.
+ */
 public enum OrderType {
-  BUY,
-  SELL
+	/**
+	 * Buy order type.
+	 */
+	BUY,
+	/**
+	 * Sell order type.
+	 */
+	SELL
 }

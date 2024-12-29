@@ -1,6 +1,15 @@
 package com.treading.coin.enums;
 
+/**
+ * The enum Role.
+ */
 public enum Role {
-  ADMIN,
-  CUSTOMER
+	/**
+	 * Admin role.
+	 */
+	ADMIN,
+	/**
+	 * Customer role.
+	 */
+	CUSTOMER
 }

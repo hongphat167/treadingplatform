@@ -4,27 +4,32 @@ import com.treading.coin.enums.WalletTransactionType;
 import com.treading.coin.model.Wallet;
 import com.treading.coin.model.WalletTransaction;
 
+/**
+ * The interface Wallet transaction service.
+ */
 public interface WalletTransactionService {
 
-  /**
-   * Create Transaction
-   *
-   * @param wallet                wallet
-   * @param walletTransactionType walletTransactionType
-   * @param transferId            transferId
-   * @param purpose               purpose
-   * @param amount                amount
-   * @return WalletTransaction
-   */
-  WalletTransaction createTransaction(Wallet wallet, WalletTransactionType walletTransactionType,
-      String transferId, String purpose, Long amount);
+	/**
+	 * Create transaction wallet transaction.
+	 *
+	 * @param wallet                the wallet
+	 * @param walletTransactionType the wallet transaction type
+	 * @param transferId            the transfer id
+	 * @param purpose               the purpose
+	 * @param amount                the amount
+	 */
+	void createTransaction(Wallet wallet,
+	                       WalletTransactionType walletTransactionType,
+	                       String transferId,
+	                       String purpose,
+	                       Long amount);
 
-  /**
-   * Get Transaction
-   *
-   * @param wallet wallet
-   * @return WalletTransaction
-   * @throws Exception
-   */
-  WalletTransaction getTransaction(Wallet wallet) throws Exception;
+	/**
+	 * Gets transaction.
+	 *
+	 * @param wallet the wallet
+	 * @return the transaction
+	 * @throws Exception the exception
+	 */
+	WalletTransaction getTransaction(Wallet wallet) throws Exception;
 }

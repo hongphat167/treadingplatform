@@ -7,74 +7,100 @@ import com.treading.coin.model.User;
 import com.treading.coin.service.PaymentService;
 import com.treading.coin.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+/**
+ * The type Payment controller.
+ */
 @RestController
 public class PaymentController {
 
-  @Autowired
-  private PaymentService paymentService;
-  @Autowired
-  private UserService userService;
 
-  @PostMapping("/api/payment/{paymentMethod}/amount/{amount}")
-  public ResponseEntity<PaymentResponse> paymentHandler(@PathVariable PaymentMethod paymentMethod,
-      @PathVariable Long amount, @RequestHeader("Authorization") String jwt) throws Exception {
+	private final PaymentService paymentService;
 
-    User user = userService.findUserProfileByJwt(jwt);
+	private final UserService userService;
 
-    String baseUrl = "https://treadingplatform-production.up.railway.app";
+	/**
+	 * Instantiates a new Payment controller.
+	 *
+	 * @param paymentService the payment service
+	 * @param userService    the user service
+	 */
+	protected PaymentController(PaymentService paymentService, UserService userService) {
+		this.paymentService = paymentService;
+		this.userService = userService;
+	}
 
-    PaymentResponse paymentResponse = new PaymentResponse();
+	/**
+	 * Payment handler response entity.
+	 *
+	 * @param paymentMethod the payment method
+	 * @param amount        the amount
+	 * @param jwt           the jwt
+	 * @return the response entity
+	 * @throws Exception the exception
+	 */
+	@PostMapping("/api/payment/{paymentMethod}/amount/{amount}")
+	public ResponseEntity<PaymentResponse> paymentHandler(@PathVariable PaymentMethod paymentMethod,
+	                                                      @PathVariable Long amount,
+	                                                      @RequestHeader("Authorization") String jwt) throws Exception {
 
-    PaymentOrder order = paymentService.createPaymentOrder(user, amount, paymentMethod);
+		User user = userService.findUserProfileByJwt(jwt);
 
-    if (paymentMethod.equals(PaymentMethod.VNPAY)) {
+		String baseUrl = "https://treadingplatform-production.up.railway.app";
 
-      paymentResponse.setPaymentUrl(
-          paymentService.createVnPayPayment(user, amount, String.valueOf(order.getId()), baseUrl));
-      paymentResponse.setCode("00");
-      paymentResponse.setMessage("success");
-      paymentResponse.setOrderId(String.valueOf(order.getId()));
-    } else if (paymentMethod.equals(PaymentMethod.MOMO)) {
-      // TO DO MOMO PAYMENT
-      return null;
-    }
-    return new ResponseEntity<>(paymentResponse, HttpStatus.CREATED);
-  }
+		PaymentResponse paymentResponse = new PaymentResponse();
 
-  @GetMapping("/vnpay-payment-return")
-  public ResponseEntity<PaymentResponse> paymentReturn(
-      HttpServletRequest request) throws Exception {
+		PaymentOrder order = paymentService.createPaymentOrder(user, amount, paymentMethod);
 
-    PaymentOrder order = paymentService.getPaymentOrderById(
-        Long.valueOf(request.getParameter("vnp_OrderInfo")));
+		if (paymentMethod.equals(PaymentMethod.VNPAY)) {
 
-    // Check payment success or not
-    boolean paymentStatus = paymentService.orderReturn(order, request);
+			paymentResponse.setPaymentUrl(
+					paymentService.createVnPayPayment(user, amount, String.valueOf(order.getId()), baseUrl));
+			paymentResponse.setCode("00");
+			paymentResponse.setMessage("success");
+			paymentResponse.setOrderId(String.valueOf(order.getId()));
+		} else if (paymentMethod.equals(PaymentMethod.MOMO)) {
+			// TO DO MOMO PAYMENT
+			return null;
+		}
+		return new ResponseEntity<>(paymentResponse, HttpStatus.CREATED);
+	}
+
+	/**
+	 * Payment return response entity.
+	 *
+	 * @param request the request
+	 * @return the response entity
+	 * @throws Exception the exception
+	 */
+	@GetMapping("/vnpay-payment-return")
+	public ResponseEntity<PaymentResponse> paymentReturn(
+			HttpServletRequest request) throws Exception {
+
+		PaymentOrder order = paymentService.getPaymentOrderById(
+				Long.valueOf(request.getParameter("vnp_OrderInfo")));
+
+		// Check payment success or not
+		boolean paymentStatus = paymentService.orderReturn(order, request);
 
     PaymentResponse paymentResponse = new PaymentResponse();
     // Handle the payment result
     if (paymentStatus) {
 
-      paymentResponse.setOrderId(request.getParameter("vnp_OrderInfo"));
-      paymentResponse.setCode(request.getParameter("vnp_TransactionStatus"));
-      return new ResponseEntity<>(paymentResponse, HttpStatus.OK);
-    } else if (!paymentStatus) {
+			paymentResponse.setOrderId(request.getParameter("vnp_OrderInfo"));
+			paymentResponse.setCode(request.getParameter("vnp_TransactionStatus"));
+			return new ResponseEntity<>(paymentResponse, HttpStatus.OK);
+		} else if (!paymentStatus) {
 
-      paymentResponse.setOrderId(request.getParameter("vnp_OrderInfo"));
-      paymentResponse.setCode(request.getParameter("vnp_TransactionStatus"));
+			paymentResponse.setOrderId(request.getParameter("vnp_OrderInfo"));
+			paymentResponse.setCode(request.getParameter("vnp_TransactionStatus"));
 
-      return new ResponseEntity<>(paymentResponse, HttpStatus.NOT_ACCEPTABLE);
-    } else {
-      throw new Exception("Invalid payment");
-    }
-  }
+			return new ResponseEntity<>(paymentResponse, HttpStatus.NOT_ACCEPTABLE);
+		} else {
+			throw new Exception("Invalid payment");
+		}
+	}
 }

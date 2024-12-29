@@ -7,13 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.treading.coin.model.Coin;
 import com.treading.coin.repository.CoinRepository;
 import com.treading.coin.service.CoinService;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,22 +17,33 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * The type Coin service.
+ */
 @Service
 @Slf4j
 public class CoinServiceImpl implements CoinService {
 
-	@Autowired
-	private CoinRepository coinRepository;
-	@Autowired
-	private ObjectMapper objectMapper;
+
+	private final CoinRepository coinRepository;
+
+	private final ObjectMapper objectMapper;
 
 	/**
-	 * Get Coin List
+	 * Instantiates a new Coin service.
 	 *
-	 * @param page page
-	 * @return coinList
-	 * @throws Exception e
+	 * @param coinRepository the coin repository
+	 * @param objectMapper   the object mapper
 	 */
+	protected CoinServiceImpl(CoinRepository coinRepository, ObjectMapper objectMapper) {
+		this.coinRepository = coinRepository;
+		this.objectMapper = objectMapper;
+	}
+
 	@Override
 	public List<Coin> getCoinList(int page) throws Exception {
 
@@ -63,14 +68,6 @@ public class CoinServiceImpl implements CoinService {
 		}
 	}
 
-	/**
-	 * Get Market Chart
-	 *
-	 * @param coinId coinId
-	 * @param days   days
-	 * @return response
-	 * @throws Exception e
-	 */
 	@Override
 	public String getMarketChart(String coinId, int days) throws Exception {
 		String url =
@@ -93,13 +90,6 @@ public class CoinServiceImpl implements CoinService {
 		}
 	}
 
-	/**
-	 * Get Coin Details
-	 *
-	 * @param coinId coinId
-	 * @return response
-	 * @throws Exception e
-	 */
 	@Override
 	public String getCoinDetails(String coinId) throws Exception {
 		String url = "https://api.coingecko.com/api/v3/coins/" + coinId;
@@ -207,13 +197,6 @@ public class CoinServiceImpl implements CoinService {
 		}
 	}
 
-	/**
-	 * Find By Id
-	 *
-	 * @param coinId coinId
-	 * @return Coin
-	 * @throws Exception e
-	 */
 	@Override
 	public Coin findById(String coinId) throws Exception {
 		Optional<Coin> coinOptional = coinRepository.findById(coinId);
@@ -223,13 +206,6 @@ public class CoinServiceImpl implements CoinService {
 		return coinOptional.get();
 	}
 
-	/**
-	 * Search Coin
-	 *
-	 * @param keyword keyword
-	 * @return String
-	 * @throws Exception e
-	 */
 	@Override
 	public String searchCoin(String keyword) throws Exception {
 		String url =
@@ -251,12 +227,6 @@ public class CoinServiceImpl implements CoinService {
 		}
 	}
 
-	/**
-	 * Get Top 50 Coins By Market Rank
-	 *
-	 * @return String
-	 * @throws Exception e
-	 */
 	@Override
 	public String getTop50CoinsByMarketRank() throws Exception {
 		String url =
@@ -278,12 +248,6 @@ public class CoinServiceImpl implements CoinService {
 		}
 	}
 
-	/**
-	 * Get Trending Coins
-	 *
-	 * @return String
-	 * @throws Exception e
-	 */
 	@Override
 	public String getTrendingCoins() throws Exception {
 		String url =

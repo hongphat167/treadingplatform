@@ -3,14 +3,17 @@ package com.treading.coin.repository;
 import com.treading.coin.model.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+/**
+ * The interface Wallet repository.
+ */
 public interface WalletRepository extends JpaRepository<Wallet, Long> {
 
-  /**
-   * Find By User Id
-   *
-   * @param userId userId
-   * @return Wallet
-   */
-  Wallet findByUserId(Long userId);
+	/**
+	 * Find by user id wallet.
+	 *
+	 * @param userId the user id
+	 * @return the wallet
+	 */
+	Wallet findByUserId(Long userId);
 
 }

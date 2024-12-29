@@ -6,70 +6,58 @@ import com.treading.coin.model.VerificationCode;
 import com.treading.coin.repository.VerificationCodeRepository;
 import com.treading.coin.service.VerificationCodeService;
 import com.treading.coin.utils.OtpUtils;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+/**
+ * The type Verification code service.
+ */
 @Service
 public class VerificationCodeServiceImpl implements VerificationCodeService {
 
-  @Autowired
-  private VerificationCodeRepository verificationCodeRepository;
 
-  /**
-   * Send Verification Code
-   *
-   * @param user             user
-   * @param verificationType verificationType
-   * @return verificationCode1
-   */
-  @Override
-  public VerificationCode sendVerificationCode(User user, VerificationType verificationType) {
+	private final VerificationCodeRepository verificationCodeRepository;
 
-    VerificationCode verificationCode1 = new VerificationCode();
-    verificationCode1.setOtp(OtpUtils.generateOTP());
-    verificationCode1.setVerificationType(verificationType);
-    verificationCode1.setUser(user);
+	/**
+	 * Instantiates a new Verification code service.
+	 *
+	 * @param verificationCodeRepository the verification code repository
+	 */
+	protected VerificationCodeServiceImpl(VerificationCodeRepository verificationCodeRepository) {
+		this.verificationCodeRepository = verificationCodeRepository;
+	}
 
-    return verificationCodeRepository.save(verificationCode1);
-  }
+	@Override
+	public VerificationCode sendVerificationCode(User user, VerificationType verificationType) {
 
-  /**
-   * Get Verification Code By Id
-   *
-   * @param id id
-   * @return verificationCode
-   */
-  @Override
-  public VerificationCode getVerificationCodeById(Long id) {
+		VerificationCode verificationCode1 = new VerificationCode();
+		verificationCode1.setOtp(OtpUtils.generateOTP());
+		verificationCode1.setVerificationType(verificationType);
+		verificationCode1.setUser(user);
 
-    Optional<VerificationCode> verificationCode = Optional.of(
-        verificationCodeRepository.findById(id).orElseThrow());
+		return verificationCodeRepository.save(verificationCode1);
+	}
 
-    return verificationCode.get();
-  }
+	@Override
+	public VerificationCode getVerificationCodeById(Long id) {
 
-  /**
-   * Get Verification Code By User
-   *
-   * @param userId userId
-   * @return userId
-   */
-  @Override
-  public VerificationCode getVerificationCodeByUser(Long userId) {
+		Optional<VerificationCode> verificationCode = Optional.of(
+				verificationCodeRepository.findById(id).orElseThrow());
 
-    return verificationCodeRepository.findByUserId(userId);
-  }
+		return verificationCode.get();
+	}
 
-  /**
-   * Delete Verification Code By Id
-   *
-   * @param verificationCode verificationCode
-   */
-  @Override
-  public void deleteVerificationCodeById(VerificationCode verificationCode) {
+	@Override
+	public VerificationCode getVerificationCodeByUser(Long userId) {
 
-    verificationCodeRepository.delete(verificationCode);
+		return verificationCodeRepository.findByUserId(userId);
+	}
 
-  }
+	@Override
+	public void deleteVerificationCodeById(VerificationCode verificationCode) {
+
+		verificationCodeRepository.delete(verificationCode);
+
+	}
 }

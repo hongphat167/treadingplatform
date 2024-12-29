@@ -4,51 +4,82 @@ import com.treading.coin.model.Asset;
 import com.treading.coin.model.User;
 import com.treading.coin.service.AssetService;
 import com.treading.coin.service.UserService;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+/**
+ * The type Asset controller.
+ */
 @RestController
 @RequestMapping("api/assets")
 public class AssetController {
 
-  @Autowired
-  private AssetService assetService;
-  @Autowired
-  private UserService userService;
 
-  @PostMapping("/{assetId}")
-  public ResponseEntity<Asset> getAssetById(@PathVariable Long assetId) throws Exception {
-    Asset asset = assetService.getAssetById(assetId);
+	private final AssetService assetService;
 
-    return new ResponseEntity<>(asset, HttpStatus.OK);
-  }
+	private final UserService userService;
 
-  @GetMapping("/coin/{coinId}/user")
-  public ResponseEntity<Asset> getAssetByUserIdAndCoinId(@PathVariable String coinId,
-      @RequestHeader("Authorization") String jwt) throws Exception {
+	/**
+	 * Instantiates a new Asset controller.
+	 *
+	 * @param assetService the asset service
+	 * @param userService  the user service
+	 */
+	protected AssetController(AssetService assetService, UserService userService) {
+		this.assetService = assetService;
+		this.userService = userService;
+	}
 
-    User user = userService.findUserProfileByJwt(jwt);
+	/**
+	 * Gets asset by id.
+	 *
+	 * @param assetId the asset id
+	 * @return the asset by id
+	 * @throws Exception the exception
+	 */
+	@PostMapping("/{assetId}")
+	public ResponseEntity<Asset> getAssetById(@PathVariable Long assetId) throws Exception {
+		Asset asset = assetService.getAssetById(assetId);
 
-    Asset asset = assetService.findAssetByUserIdAndCoinId(user.getId(), coinId);
+		return new ResponseEntity<>(asset, HttpStatus.OK);
+	}
 
-    return new ResponseEntity<>(asset, HttpStatus.OK);
-  }
+	/**
+	 * Gets asset by user id and coin id.
+	 *
+	 * @param coinId the coin id
+	 * @param jwt    the jwt
+	 * @return the asset by user id and coin id
+	 * @throws Exception the exception
+	 */
+	@GetMapping("/coin/{coinId}/user")
+	public ResponseEntity<Asset> getAssetByUserIdAndCoinId(@PathVariable String coinId,
+	                                                       @RequestHeader("Authorization") String jwt) throws Exception {
 
-  @GetMapping("/get-list-asset")
-  public ResponseEntity<List<Asset>> getAssetsForUser(@RequestHeader("Authorization") String jwt)
-      throws Exception {
+		User user = userService.findUserProfileByJwt(jwt);
 
-    User user = userService.findUserProfileByJwt(jwt);
-    List<Asset> assetList = assetService.getUsersAssets(user.getId());
+		Asset asset = assetService.findAssetByUserIdAndCoinId(user.getId(), coinId);
 
-    return new ResponseEntity<>(assetList, HttpStatus.OK);
-  }
+		return new ResponseEntity<>(asset, HttpStatus.OK);
+	}
+
+	/**
+	 * Gets assets for user.
+	 *
+	 * @param jwt the jwt
+	 * @return the assets for user
+	 * @throws Exception the exception
+	 */
+	@GetMapping("/get-list-asset")
+	public ResponseEntity<List<Asset>> getAssetsForUser(@RequestHeader("Authorization") String jwt)
+			throws Exception {
+
+		User user = userService.findUserProfileByJwt(jwt);
+		List<Asset> assetList = assetService.getUsersAssets(user.getId());
+
+		return new ResponseEntity<>(assetList, HttpStatus.OK);
+	}
 }

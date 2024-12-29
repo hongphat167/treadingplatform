@@ -6,93 +6,70 @@ import com.treading.coin.model.TwoFactorAuth;
 import com.treading.coin.model.User;
 import com.treading.coin.repository.UserRepository;
 import com.treading.coin.service.UserService;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+/**
+ * The type User service.
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
-  @Autowired
-  private UserRepository userRepository;
+	private final UserRepository userRepository;
 
-  /**
-   * Find User Profile By Jwt
-   *
-   * @param jwt jwt
-   * @return user
-   * @throws Exception e
-   */
-  @Override
-  public User findUserProfileByJwt(String jwt) throws Exception {
-    String email = JwtProvider.getEmailFromToken(jwt);
-    User user = userRepository.findByEmail(email);
+	/**
+	 * Instantiates a new User service.
+	 *
+	 * @param userRepository the user repository
+	 */
+	protected UserServiceImpl(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
-    if (user == null) {
-      throw new Exception("User not found");
-    }
-    return user;
-  }
+	@Override
+	public User findUserProfileByJwt(String jwt) throws Exception {
+		String email = JwtProvider.getEmailFromToken(jwt);
+		User user = userRepository.findByEmail(email);
 
-  /**
-   * Find User By Email
-   *
-   * @param email email
-   * @return user
-   * @throws Exception e
-   */
-  @Override
-  public User findUserByEmail(String email) throws Exception {
-    User user = userRepository.findByEmail(email);
+		if (user == null) {
+			throw new Exception("User not found");
+		}
+		return user;
+	}
 
-    if (user == null) {
-      throw new Exception("User not found");
-    }
-    return user;
-  }
+	@Override
+	public User findUserByEmail(String email) throws Exception {
+		User user = userRepository.findByEmail(email);
 
-  /**
-   * Find User By UserId
-   *
-   * @param userId userId
-   * @return user
-   */
-  @Override
-  public User findUserByUserId(Long userId) {
-    Optional<User> user = Optional.of(userRepository.findById(userId).orElseThrow());
-    return user.get();
-  }
+		if (user == null) {
+			throw new Exception("User not found");
+		}
+		return user;
+	}
 
-  /**
-   * Enable Two-Factor Authentication
-   *
-   * @param verificationType verificationType
-   * @param sendTo           sendTo
-   * @param user             user
-   * @return user
-   */
-  @Override
-  public User enableTwoFactorAuthentication(VerificationType verificationType, String sendTo,
-      User user) {
+	@Override
+	public User findUserByUserId(Long userId) {
+		Optional<User> user = Optional.of(userRepository.findById(userId).orElseThrow());
+		return user.get();
+	}
 
-    TwoFactorAuth twoFactorAuth = new TwoFactorAuth();
-    twoFactorAuth.setEnabled(true);
-    twoFactorAuth.setSendTo(verificationType);
+	@Override
+	public User enableTwoFactorAuthentication(VerificationType verificationType, String sendTo,
+	                                          User user) {
 
-    user.setTwoFactorAuth(twoFactorAuth);
+		TwoFactorAuth twoFactorAuth = new TwoFactorAuth();
+		twoFactorAuth.setEnabled(true);
+		twoFactorAuth.setSendTo(verificationType);
 
-    return userRepository.save(user);
-  }
+		user.setTwoFactorAuth(twoFactorAuth);
 
-  /**
-   * Update Password
-   *
-   * @param user        user
-   * @param newPassword newPassword
-   */
-  @Override
-  public void updatePassword(User user, String newPassword) {
-    user.setPassword(newPassword);
-    userRepository.save(user);
-  }
+		return userRepository.save(user);
+	}
+
+	@Override
+	public void updatePassword(User user, String newPassword) {
+		user.setPassword(newPassword);
+		userRepository.save(user);
+	}
 }

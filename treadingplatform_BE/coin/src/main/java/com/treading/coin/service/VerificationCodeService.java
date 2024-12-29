@@ -4,37 +4,40 @@ import com.treading.coin.enums.VerificationType;
 import com.treading.coin.model.User;
 import com.treading.coin.model.VerificationCode;
 
+/**
+ * The interface Verification code service.
+ */
 public interface VerificationCodeService {
 
-  /**
-   * Send Verification Code
-   *
-   * @param user             user
-   * @param verificationType verificationType
-   * @return VerificationCode
-   */
-  VerificationCode sendVerificationCode(User user, VerificationType verificationType);
+	/**
+	 * Send verification code verification code.
+	 *
+	 * @param user             the user
+	 * @param verificationType the verification type
+	 * @return the verification code
+	 */
+	VerificationCode sendVerificationCode(User user, VerificationType verificationType);
 
-  /**
-   * Get Verification Code By Id
-   *
-   * @param id id
-   * @return VerificationCode
-   */
-  VerificationCode getVerificationCodeById(Long id);
+	/**
+	 * Gets verification code by id.
+	 *
+	 * @param id the id
+	 * @return the verification code by id
+	 */
+	VerificationCode getVerificationCodeById(Long id);
 
-  /**
-   * Get Verification Code By User
-   *
-   * @param userId userId
-   * @return VerificationCode
-   */
-  VerificationCode getVerificationCodeByUser(Long userId);
+	/**
+	 * Gets verification code by user.
+	 *
+	 * @param userId the user id
+	 * @return the verification code by user
+	 */
+	VerificationCode getVerificationCodeByUser(Long userId);
 
-  /**
-   * Delete Verification Code By Id
-   *
-   * @param verificationCode verificationCode
-   */
-  void deleteVerificationCodeById(VerificationCode verificationCode);
+	/**
+	 * Delete verification code by id.
+	 *
+	 * @param verificationCode the verification code
+	 */
+	void deleteVerificationCodeById(VerificationCode verificationCode);
 }

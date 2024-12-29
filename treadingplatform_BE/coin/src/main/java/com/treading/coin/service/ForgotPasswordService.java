@@ -4,41 +4,44 @@ import com.treading.coin.enums.VerificationType;
 import com.treading.coin.model.ForgotPasswordToken;
 import com.treading.coin.model.User;
 
+/**
+ * The interface Forgot password service.
+ */
 public interface ForgotPasswordService {
 
-  /**
-   * Create Token
-   *
-   * @param user             user
-   * @param id               id
-   * @param otp              otp
-   * @param verificationType verificationType
-   * @param sendTo           sendTo
-   * @return ForgotPasswordToken
-   */
-  ForgotPasswordToken createToken(User user, String id, String otp,
-      VerificationType verificationType, String sendTo);
+	/**
+	 * Create token forgot password token.
+	 *
+	 * @param user             the user
+	 * @param id               the id
+	 * @param otp              the otp
+	 * @param verificationType the verification type
+	 * @param sendTo           the send to
+	 * @return the forgot password token
+	 */
+	ForgotPasswordToken createToken(User user, String id, String otp,
+	                                VerificationType verificationType, String sendTo);
 
-  /**
-   * Find By Id
-   *
-   * @param id id
-   * @return ForgotPasswordToken
-   */
-  ForgotPasswordToken findById(String id);
+	/**
+	 * Find by id forgot password token.
+	 *
+	 * @param id the id
+	 * @return the forgot password token
+	 */
+	ForgotPasswordToken findById(String id);
 
-  /**
-   * Find By User
-   *
-   * @param userId userId
-   * @return ForgotPasswordToken
-   */
-  ForgotPasswordToken findByUser(Long userId);
+	/**
+	 * Find by user forgot password token.
+	 *
+	 * @param userId the user id
+	 * @return the forgot password token
+	 */
+	ForgotPasswordToken findByUser(Long userId);
 
-  /**
-   * Delete Token
-   *
-   * @param forgotPasswordToken forgotPasswordToken
-   */
-  void deleteToken(ForgotPasswordToken forgotPasswordToken);
+	/**
+	 * Delete token.
+	 *
+	 * @param forgotPasswordToken the forgot password token
+	 */
+	void deleteToken(ForgotPasswordToken forgotPasswordToken);
 }

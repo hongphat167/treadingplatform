@@ -3,15 +3,12 @@ package com.treading.coin.model;
 import com.treading.coin.enums.VerificationType;
 import lombok.Data;
 
+/**
+ * The type Two factor auth.
+ */
 @Data
 public class TwoFactorAuth {
 
-  /**
-   * is_enabled
-   */
-  private boolean isEnabled = false;
-  /**
-   * verification_type
-   */
-  private VerificationType sendTo;
+	private boolean isEnabled = false;
+	private VerificationType sendTo;
 }

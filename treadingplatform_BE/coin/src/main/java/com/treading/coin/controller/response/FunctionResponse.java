@@ -2,18 +2,12 @@ package com.treading.coin.controller.response;
 
 import lombok.Data;
 
+/**
+ * The type Function response.
+ */
 @Data
 public class FunctionResponse {
-    /**
-     * currencyName
-     */
-    private String currencyName;
-    /**
-     * functionName
-     */
-    private String functionName;
-    /**
-     * currencyData
-     */
-    private String currencyData;
+	private String currencyName;
+	private String functionName;
+	private String currencyData;
 }

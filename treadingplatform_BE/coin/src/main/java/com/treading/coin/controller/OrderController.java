@@ -8,77 +8,103 @@ import com.treading.coin.model.User;
 import com.treading.coin.service.CoinService;
 import com.treading.coin.service.OrderService;
 import com.treading.coin.service.UserService;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+/**
+ * The type Order controller.
+ */
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
 
-  @Autowired
-  private OrderService orderService;
-  @Autowired
-  private UserService userService;
-  @Autowired
-  private CoinService coinService;
 
-  //  private WalletTransactionService walletTransactionService;
+	private final OrderService orderService;
 
-  /**
-   * /api/orders/pay
-   */
-  @PostMapping("/pay")
-  public ResponseEntity<Order> payOrderPayment(@RequestHeader("Authorization") String jwt,
-      @RequestBody OrderRequest request) throws Exception {
+	private final UserService userService;
 
-    User user = userService.findUserProfileByJwt(jwt);
-    Coin coin = coinService.findById(request.getCoinId());
+	private final CoinService coinService;
 
-    Order order = orderService.processOrder(coin, request.getQuantity(), request.getOrderType(),
-        user);
+	/**
+	 * Instantiates a new Order controller.
+	 *
+	 * @param orderService the order service
+	 * @param userService  the user service
+	 * @param coinService  the coin service
+	 */
+	protected OrderController(OrderService orderService, UserService userService, CoinService coinService) {
+		this.orderService = orderService;
+		this.userService = userService;
+		this.coinService = coinService;
+	}
 
-    return new ResponseEntity<>(order, HttpStatus.OK);
-  }
+	//  private WalletTransactionService walletTransactionService;
 
-  /**
-   * /api/orders/{orderId}
-   */
-  @GetMapping("/{orderId}")
-  public ResponseEntity<Order> getOrderById(
-      @RequestHeader("Authorization") String jwt, @PathVariable Long orderId) throws Exception {
+	/**
+	 * Pay order payment response entity.
+	 *
+	 * @param jwt     the jwt
+	 * @param request the request
+	 * @return the response entity
+	 * @throws Exception the exception
+	 */
+	@PostMapping("/pay")
+	public ResponseEntity<Order> payOrderPayment(@RequestHeader("Authorization") String jwt,
+	                                             @RequestBody OrderRequest request) throws Exception {
 
-    User user = userService.findUserProfileByJwt(jwt);
-    Order order = orderService.getOrderById(orderId);
+		User user = userService.findUserProfileByJwt(jwt);
+		Coin coin = coinService.findById(request.getCoinId());
 
-    if (order.getUser().getId().equals(user.getId())) {
-      return new ResponseEntity<>(order, HttpStatus.OK);
-    } else {
-      throw new Exception("Invalid user");
-    }
-  }
-  /**
-   * /api/orders/get-all-order
-   */
-  @GetMapping("/get-all-order")
-  public ResponseEntity<List<Order>> getAllOrderForUser(
-      @RequestHeader("Authorization") String jwt,
-      @RequestParam(required = false) OrderType orderType,
-      @RequestParam(required = false) String assetSymbol) throws Exception {
+		Order order = orderService.processOrder(coin, request.getQuantity(), request.getOrderType(),
+				user);
 
-    Long userId = userService.findUserProfileByJwt(jwt).getId();
+		return new ResponseEntity<>(order, HttpStatus.OK);
+	}
 
-    List<Order> userOrders = orderService.getAllOrderOfUser(userId, orderType, assetSymbol);
-    return new ResponseEntity<>(userOrders, HttpStatus.OK);
-  }
+	/**
+	 * Gets order by id.
+	 *
+	 * @param jwt     the jwt
+	 * @param orderId the order id
+	 * @return the order by id
+	 * @throws Exception the exception
+	 */
+	@GetMapping("/{orderId}")
+	public ResponseEntity<Order> getOrderById(
+			@RequestHeader("Authorization") String jwt, @PathVariable Long orderId) throws Exception {
+
+		User user = userService.findUserProfileByJwt(jwt);
+		Order order = orderService.getOrderById(orderId);
+
+		if (order.getUser().getId().equals(user.getId())) {
+			return new ResponseEntity<>(order, HttpStatus.OK);
+		} else {
+			throw new Exception("Invalid user");
+		}
+	}
+
+	/**
+	 * Gets all order for user.
+	 *
+	 * @param jwt         the jwt
+	 * @param orderType   the order type
+	 * @param assetSymbol the asset symbol
+	 * @return the all order for user
+	 * @throws Exception the exception
+	 */
+	@GetMapping("/get-all-order")
+	public ResponseEntity<List<Order>> getAllOrderForUser(
+			@RequestHeader("Authorization") String jwt,
+			@RequestParam(required = false) OrderType orderType,
+			@RequestParam(required = false) String assetSymbol) throws Exception {
+
+		Long userId = userService.findUserProfileByJwt(jwt).getId();
+
+		List<Order> userOrders = orderService.getAllOrderOfUser(userId, orderType, assetSymbol);
+		return new ResponseEntity<>(userOrders, HttpStatus.OK);
+	}
 
 }

@@ -2,7 +2,13 @@ package com.treading.coin.controller.request;
 
 import lombok.Data;
 
+/**
+ * The type Prompt ai request.
+ */
 @Data
 public class PromptAiRequest {
-    String prompt;
+	/**
+	 * The Prompt.
+	 */
+	String prompt;
 }

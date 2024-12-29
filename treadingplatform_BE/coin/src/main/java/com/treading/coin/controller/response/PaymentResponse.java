@@ -1,23 +1,15 @@
 package com.treading.coin.controller.response;
 
+
 import lombok.Data;
 
+/**
+ * The type Payment response.
+ */
 @Data
 public class PaymentResponse {
-  /**
-   * order_id
-   */
-  private String orderId;
-  /**
-   * code
-   */
-  private String code;
-  /**
-   * message
-   */
-  private String message;
-  /**
-   * payment_url
-   */
-  private String paymentUrl;
+	private String orderId;
+	private String code;
+	private String message;
+	private String paymentUrl;
 }

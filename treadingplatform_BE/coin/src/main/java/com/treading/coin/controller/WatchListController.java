@@ -6,66 +6,90 @@ import com.treading.coin.model.WatchList;
 import com.treading.coin.service.CoinService;
 import com.treading.coin.service.UserService;
 import com.treading.coin.service.WatchListService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+/**
+ * The type Watch list controller.
+ */
 @RestController
 @RequestMapping("/api/watch-list")
 public class WatchListController {
 
-  @Autowired
-  private WatchListService watchListService;
 
-  @Autowired
-  private UserService userService;
-  @Autowired
-  private CoinService coinService;
+	private final WatchListService watchListService;
 
-  /**
-   * /api/watch-list/user
-   */
-  @GetMapping("/user")
-  public ResponseEntity<WatchList> getUserWatchList(@RequestHeader("Authorization") String jwt)
-      throws Exception {
+	private final UserService userService;
 
-    User user = userService.findUserProfileByJwt(jwt);
+	private final CoinService coinService;
 
-    WatchList watchList = watchListService.findUserWatchList(user.getId());
+	/**
+	 * Instantiates a new Watch list controller.
+	 *
+	 * @param watchListService the watch list service
+	 * @param userService      the user service
+	 * @param coinService      the coin service
+	 */
+	protected WatchListController(WatchListService watchListService,
+	                              UserService userService,
+	                              CoinService coinService) {
+		this.watchListService = watchListService;
+		this.userService = userService;
+		this.coinService = coinService;
+	}
 
-    return new ResponseEntity<>(watchList, HttpStatus.OK);
-  }
+	/**
+	 * Gets user watch list.
+	 *
+	 * @param jwt the jwt
+	 * @return the user watch list
+	 * @throws Exception the exception
+	 */
+	@GetMapping("/user")
+	public ResponseEntity<WatchList> getUserWatchList(@RequestHeader("Authorization") String jwt)
+			throws Exception {
 
-  /**
-   * /api/watch-list/{watchListId}
-   */
-  @GetMapping("/{watchListId}")
-  public ResponseEntity<WatchList> getWatchListById(@PathVariable Long watchListId)
-      throws Exception {
-    WatchList watchList = watchListService.findById(watchListId);
+		User user = userService.findUserProfileByJwt(jwt);
 
-    return new ResponseEntity<>(watchList, HttpStatus.OK);
-  }
+		WatchList watchList = watchListService.findUserWatchList(user.getId());
 
-  /**
-   * /api/watch-list/add/coin/{coinId}
-   */
-  @PatchMapping("/add/coin/{coinId}")
-  public ResponseEntity<Coin> addItemToWatchList(@RequestHeader("Authorization") String jwt,
-      @PathVariable String coinId)
-      throws Exception {
+		return new ResponseEntity<>(watchList, HttpStatus.OK);
+	}
 
-    User user = userService.findUserProfileByJwt(jwt);
-    Coin coin = coinService.findById(coinId);
+	/**
+	 * Gets watch list by id.
+	 *
+	 * @param watchListId the watch list id
+	 * @return the watch list by id
+	 * @throws Exception the exception
+	 */
+	@GetMapping("/{watchListId}")
+	public ResponseEntity<WatchList> getWatchListById(@PathVariable Long watchListId)
+			throws Exception {
+		WatchList watchList = watchListService.findById(watchListId);
 
-    Coin addedCoin = watchListService.addItemToWatchList(coin, user);
+		return new ResponseEntity<>(watchList, HttpStatus.OK);
+	}
 
-    return new ResponseEntity<>(addedCoin, HttpStatus.OK);
-  }
+	/**
+	 * Add item to watch list response entity.
+	 *
+	 * @param jwt    the jwt
+	 * @param coinId the coin id
+	 * @return the response entity
+	 * @throws Exception the exception
+	 */
+	@PatchMapping("/add/coin/{coinId}")
+	public ResponseEntity<Coin> addItemToWatchList(@RequestHeader("Authorization") String jwt,
+	                                               @PathVariable String coinId)
+			throws Exception {
+
+		User user = userService.findUserProfileByJwt(jwt);
+		Coin coin = coinService.findById(coinId);
+
+		Coin addedCoin = watchListService.addItemToWatchList(coin, user);
+
+		return new ResponseEntity<>(addedCoin, HttpStatus.OK);
+	}
 }
