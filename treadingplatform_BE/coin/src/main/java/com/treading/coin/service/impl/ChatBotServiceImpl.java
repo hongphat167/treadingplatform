@@ -9,6 +9,7 @@ import com.treading.coin.service.ChatBotService;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -25,22 +26,267 @@ import java.math.BigDecimal;
 public class ChatBotServiceImpl implements ChatBotService {
 
 
+	private static final String COINGECKO_API_URL = "https://api.coingecko.com/api/v3/coins/";
+
 	private final ObjectMapper objectMapper;
+	private final RestTemplate restTemplate;
 
-	private final String apiGeminiKey = "AIzaSyDnEd8Vq698HHdHqwdbgJk1spybNjrfPwk";
-	private final String geminiApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + apiGeminiKey;
+	@Value("${gemini.api.key}")
+	private String apiGeminiKey;
 
-	private final RestTemplate restTemplate = new RestTemplate();
+	@Value("${gemini.api.url}")
+	private String geminiApiBaseUrl;
+
+	private String getGeminiApiUrl() {
+		return geminiApiBaseUrl + "?key=" + apiGeminiKey;
+	}
 
 	/**
 	 * Instantiates a new Chat bot service.
 	 *
 	 * @param objectMapper the object mapper
+	 * @param restTemplate the rest template
 	 */
-	protected ChatBotServiceImpl(ObjectMapper objectMapper) {
+	protected ChatBotServiceImpl(ObjectMapper objectMapper, RestTemplate restTemplate) {
 		this.objectMapper = objectMapper;
+		this.restTemplate = restTemplate;
 	}
 
+	@Override
+	public ApiResponse getCoinDetails(String prompt) throws Exception {
+
+		FunctionResponse rp = functionResponse(prompt);
+		Coin apiCoinResponse = getCoin(rp.getCurrencyName());
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		String body = new JSONObject()
+				.put("contents", new JSONArray()
+						.put(new JSONObject()
+								.put("role", "user")
+								.put("parts", new JSONArray()
+										.put(new JSONObject()
+												.put("text", prompt)
+										)
+								)
+						)
+						.put(new JSONObject()
+								.put("role", "model")
+								.put("parts", new JSONArray()
+										.put(new JSONObject()
+												.put("functionCall", new JSONObject()
+														.put("name", "getCoinDetails")
+														.put("args", new JSONObject()
+																.put("currencyName", rp.getCurrencyName())
+																.put("currencyData", rp.getCurrencyData())
+														)
+												)
+										)
+								)
+						)
+						.put(new JSONObject()
+								.put("role", "function")
+								.put("parts", new JSONArray()
+										.put(new JSONObject()
+												.put("functionResponse", new JSONObject()
+														.put("name", "getCoinDetails")
+														.put("response", new JSONObject()
+																.put("name", "getCoinDetails")
+																.put("content", apiCoinResponse)
+														)
+												)
+										)
+								)
+						)
+				)
+				.put("tools", new JSONArray()
+						.put(new JSONObject()
+								.put("functionDeclarations", new JSONArray()
+										.put(new JSONObject()
+												.put("name", "getCoinDetails")
+												.put("description", "Get crypto currency data from given currency object.")
+												.put("parameters", new JSONObject()
+														.put("type", "OBJECT")
+														.put("properties", new JSONObject()
+																.put("currencyName", new JSONObject()
+																		.put("type", "STRING")
+																		.put("description",
+																				"The currency Name, " +
+																						"id, " +
+																						"symbol.")
+																)
+																.put("currencyData", new JSONObject()
+																		.put("type", "STRING")
+																		.put("description",
+																				"The currency data id, " +
+																						"symbol, current price, " +
+																						"image, " +
+																						"market cap rank" +
+																						"market cap extra...")
+																)
+														)
+														.put("required", new JSONArray()
+																.put("currencyName")
+																.put("currencyData")
+														)
+												)
+										)
+								)
+						)
+				)
+				.toString();
+		HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> responseEntity = restTemplate.postForEntity(getGeminiApiUrl(), requestEntity, String.class);
+		String responseBody = responseEntity.getBody();
+		JSONObject jsonObject = new JSONObject(responseBody);
+
+		JSONArray candidates = jsonObject.getJSONArray("candidates");
+		JSONObject content = candidates.getJSONObject(0).getJSONObject("content");
+		JSONArray parts = content.getJSONArray("parts");
+		String text = parts.getJSONObject(0).getString("text");
+
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setMessage(text);
+		return apiResponse;
+	}
+
+	/**
+	 * Function response function response.
+	 *
+	 * @param prompt the prompt
+	 * @return the function response
+	 * @throws Exception the exception
+	 */
+	public FunctionResponse functionResponse(String prompt) throws Exception {
+		// Tạo JSON yêu cầu
+		JSONObject jsonObject = new JSONObject()
+				.put("contents", new JSONArray()
+						.put(new JSONObject()
+								.put("parts", new JSONArray()
+										.put(new JSONObject()
+												.put("text", prompt)
+										)
+								)
+						)
+				)
+				.put("tools", new JSONArray()
+						.put(new JSONObject()
+								.put("functionDeclarations", new JSONArray()
+										.put(new JSONObject()
+												.put("name", "getCoinDetails")
+												.put("description", "Get crypto currency data form given currency object")
+												.put("parameters", new JSONObject()
+														.put("type", "OBJECT")
+														.put("properties", new JSONObject()
+																.put("currencyName", new JSONObject()
+																		.put("type", "STRING")
+																		.put("description", "Name of coin")
+																)
+																.put("currencyData", new JSONObject()
+																		.put("type", "STRING")
+																		.put("description", "id, symbol, name, image, current_price, market_cap, market_cap_rank, total_volume, high_24h, low_24h, price_change_24h, price_change_percentage_24h, market_cap_change_24h, market_cap_change_percentage_24h, circulating_supply, total_supply, max_supply, ath, ath_change_percentage, ath_date, atl, atl_change_percentage, atl_date, last_updated"
+																		)
+																)
+														)
+														.put("required", new JSONArray()
+																.put("currencyName")
+																.put("currencyData")
+														)
+												)
+										)
+								)
+						)
+				);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<String> requestEntity = new HttpEntity<>(jsonObject.toString(), headers);
+		log.info("Request entity {}", requestEntity);
+
+		try {
+			// Gửi yêu cầu đến API
+			ResponseEntity<String> response = restTemplate.postForEntity(getGeminiApiUrl(), requestEntity, String.class);
+
+			// Kiểm tra xem phản hồi có thành công không
+			if (response.getStatusCode() != HttpStatus.OK) {
+				throw new Exception("Failed to get response from API. Status: " + response.getStatusCode());
+			}
+
+			String responseBody = response.getBody();
+			JSONObject functionCall = getJsonObject(responseBody);
+
+			// Trích xuất chi tiết từ function call
+			String functionName = functionCall.getString("name");
+			log.info("functionName {}", functionName);
+
+			JSONObject args = functionCall.optJSONObject("args");
+			if (args == null) {
+				log.error("Arguments not found in function call");
+				throw new Exception("Arguments not found in function call");
+			}
+
+			// Trích xuất các trường cần thiết
+			String currencyName = args.optString("currencyName", "").toLowerCase();
+			String currencyData = args.optString("currencyData", "").toLowerCase();
+
+			if (currencyName.isEmpty() || currencyData.isEmpty()) {
+				throw new Exception("Required fields 'currencyName' or 'currencyData' are missing");
+			}
+
+			log.info("responseBody {}", responseBody);
+
+			// Tạo đối tượng FunctionResponse
+			FunctionResponse functionResponse = new FunctionResponse();
+			functionResponse.setFunctionName(functionName);
+			functionResponse.setCurrencyName(currencyName);
+			functionResponse.setCurrencyData(currencyData);
+
+			return functionResponse;
+
+		} catch (Exception e) {
+			log.error("Error in functionResponse: ", e);
+			throw new Exception("Error processing function response: " + e.getMessage(), e);
+		}
+	}
+
+	private static JSONObject getJsonObject(String responseBody) throws Exception {
+		if (responseBody == null) {
+			throw new Exception("Response body is null");
+		}
+
+		JSONArray parts = getObjects(responseBody);
+		if (parts == null || parts.isEmpty()) {
+			throw new Exception("Parts array is empty in content");
+		}
+
+		JSONObject part = parts.getJSONObject(0);
+		JSONObject functionCall = part.optJSONObject("functionCall");
+		if (functionCall == null) {
+			throw new Exception("Function call not found in part");
+		}
+		return functionCall;
+	}
+
+	private static JSONArray getObjects(String responseBody) throws Exception {
+		JSONObject responseObject = new JSONObject(responseBody);
+
+		// Kiểm tra nếu mảng "candidates" tồn tại và không rỗng
+		if (!responseObject.has("candidates") || responseObject.getJSONArray("candidates").isEmpty()) {
+			throw new Exception("No candidates found in the response");
+		}
+
+		JSONArray candidates = responseObject.getJSONArray("candidates");
+		JSONObject candidate = candidates.getJSONObject(0);
+
+		JSONObject content = candidate.optJSONObject("content");
+		if (content == null) {
+			throw new Exception("Content not found in candidate");
+		}
+
+		return content.optJSONArray("parts");
+	}
 
 	/**
 	 * Gets coin.
@@ -50,7 +296,7 @@ public class ChatBotServiceImpl implements ChatBotService {
 	 * @throws Exception the exception
 	 */
 	public Coin getCoin(String currencyName) throws Exception {
-		String url = "https://api.coingecko.com/api/v3/coins/" + currencyName;
+		String url = COINGECKO_API_URL + currencyName;
 		try {
 			HttpHeaders headers = new HttpHeaders();
 
@@ -152,244 +398,4 @@ public class ChatBotServiceImpl implements ChatBotService {
 		}
 	}
 
-	/**
-	 * Function response function response.
-	 *
-	 * @param prompt the prompt
-	 * @return the function response
-	 * @throws Exception the exception
-	 */
-	public FunctionResponse functionResponse(String prompt) throws Exception {
-		// Tạo JSON yêu cầu
-		JSONObject jsonObject = new JSONObject()
-				.put("contents", new JSONArray()
-						.put(new JSONObject()
-								.put("parts", new JSONArray()
-										.put(new JSONObject()
-												.put("text", prompt)
-										)
-								)
-						)
-				)
-				.put("tools", new JSONArray()
-						.put(new JSONObject()
-								.put("functionDeclarations", new JSONArray()
-										.put(new JSONObject()
-												.put("name", "getCoinDetails")
-												.put("description", "Get crypto currency data form given currency object")
-												.put("parameters", new JSONObject()
-														.put("type", "OBJECT")
-														.put("properties", new JSONObject()
-																.put("currencyName", new JSONObject()
-																		.put("type", "STRING")
-																		.put("description", "The currency Name, id, symbol.")
-																)
-																.put("currencyData", new JSONObject()
-																		.put("type", "STRING")
-																		.put("description", "The currency data id, symbol, name, image, current_price, " +
-																				"market_cap, market_cap_rank, fully_diluted_valuation, total_volume, high_24h, " +
-																				"low_24h, price_change_24h, price_change_percentage_24h, market_cap_change_24h, " +
-																				"market_cap_change_percentage_24h, circulating_supply, total_supply, max_supply, " +
-																				"ath, ath_change_percentage, ath_date, atl, atl_change_percentage, atl_date, last_updated."
-																		)
-																)
-														)
-														.put("required", new JSONArray()
-																.put("currencyName")
-																.put("currencyData")
-														)
-												)
-										)
-								)
-						)
-				);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-
-		HttpEntity<String> requestEntity = new HttpEntity<>(jsonObject.toString(), headers);
-		log.info("Request entity {}", requestEntity);
-
-		try {
-			// Gửi yêu cầu đến API
-			ResponseEntity<String> response = restTemplate.postForEntity(geminiApiUrl, requestEntity, String.class);
-
-			// Kiểm tra xem phản hồi có thành công không
-			if (response.getStatusCode() != HttpStatus.OK) {
-				throw new Exception("Failed to get response from API. Status: " + response.getStatusCode());
-			}
-
-			String responseBody = response.getBody();
-			JSONObject functionCall = getJsonObject(responseBody);
-
-			// Trích xuất chi tiết từ function call
-			String functionName = functionCall.getString("name");
-			log.info("functionName {}", functionName);
-
-			JSONObject args = functionCall.optJSONObject("args");
-			if (args == null) {
-				log.error("Arguments not found in function call");
-				throw new Exception("Arguments not found in function call");
-			}
-
-			// Trích xuất các trường cần thiết
-			String currencyName = args.optString("currencyName", "").toLowerCase();
-			String currencyData = args.optString("currencyData", "").toLowerCase();
-
-			if (currencyName.isEmpty() || currencyData.isEmpty()) {
-				throw new Exception("Required fields 'currencyName' or 'currencyData' are missing");
-			}
-
-			log.info("responseBody {}", responseBody);
-
-			// Tạo đối tượng FunctionResponse
-			FunctionResponse functionResponse = new FunctionResponse();
-			functionResponse.setFunctionName(functionName);
-			functionResponse.setCurrencyName(currencyName);
-			functionResponse.setCurrencyData(currencyData);
-
-			return functionResponse;
-
-		} catch (Exception e) {
-			log.error("Error in functionResponse: ", e);
-			throw new Exception("Error processing function response: " + e.getMessage(), e);
-		}
-	}
-
-	private static JSONObject getJsonObject(String responseBody) throws Exception {
-		if (responseBody == null) {
-			throw new Exception("Response body is null");
-		}
-
-		JSONArray parts = getObjects(responseBody);
-		if (parts == null || parts.isEmpty()) {
-			throw new Exception("Parts array is empty in content");
-		}
-
-		JSONObject part = parts.getJSONObject(0);
-		JSONObject functionCall = part.optJSONObject("functionCall");
-		if (functionCall == null) {
-			throw new Exception("Function call not found in part");
-		}
-		return functionCall;
-	}
-
-	private static JSONArray getObjects(String responseBody) throws Exception {
-		JSONObject responseObject = new JSONObject(responseBody);
-
-		// Kiểm tra nếu mảng "candidates" tồn tại và không rỗng
-		if (!responseObject.has("candidates") || responseObject.getJSONArray("candidates").isEmpty()) {
-			throw new Exception("No candidates found in the response");
-		}
-
-		JSONArray candidates = responseObject.getJSONArray("candidates");
-		JSONObject candidate = candidates.getJSONObject(0);
-
-		JSONObject content = candidate.optJSONObject("content");
-		if (content == null) {
-			throw new Exception("Content not found in candidate");
-		}
-
-		return content.optJSONArray("parts");
-	}
-
-
-	@Override
-	public ApiResponse getCoinDetails(String prompt) throws Exception {
-
-		FunctionResponse rp = functionResponse(prompt);
-		Coin apiCoinResponse = getCoin(rp.getCurrencyName());
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-
-		String body = new JSONObject()
-				.put("contents", new JSONArray()
-						.put(new JSONObject()
-								.put("role", "user")
-								.put("parts", new JSONArray()
-										.put(new JSONObject()
-												.put("text", prompt)
-										)
-								)
-						)
-						.put(new JSONObject()
-								.put("role", "model")
-								.put("parts", new JSONArray()
-										.put(new JSONObject()
-												.put("functionCall", new JSONObject()
-														.put("name", "getCoinDetails")
-														.put("args", new JSONObject()
-																.put("currencyName", rp.getCurrencyName())
-																.put("currencyData", rp.getCurrencyData())
-														)
-												)
-										)
-								)
-						)
-						.put(new JSONObject()
-								.put("role", "function")
-								.put("parts", new JSONArray()
-										.put(new JSONObject()
-												.put("functionResponse", new JSONObject()
-														.put("name", "getCoinDetails")
-														.put("response", new JSONObject()
-																.put("name", "getCoinDetails")
-																.put("content", apiCoinResponse)
-														)
-												)
-										)
-								)
-						)
-				)
-				.put("tools", new JSONArray()
-						.put(new JSONObject()
-								.put("functionDeclarations", new JSONArray()
-										.put(new JSONObject()
-												.put("name", "getCoinDetails")
-												.put("description", "Get crypto currency data from given currency object.")
-												.put("parameters", new JSONObject()
-														.put("type", "OBJECT")
-														.put("properties", new JSONObject()
-																.put("currencyName", new JSONObject()
-																		.put("type", "STRING")
-																		.put("description",
-																				"The currency Name, " +
-																						"id, " +
-																						"symbol.")
-																)
-																.put("currencyData", new JSONObject()
-																		.put("type", "STRING")
-																		.put("description",
-																				"The currency data id, " +
-																						"symbol, current price, " +
-																						"image, " +
-																						"market cap rank" +
-																						"market cap extra...")
-																)
-														)
-														.put("required", new JSONArray()
-																.put("currencyName")
-																.put("currencyData")
-														)
-												)
-										)
-								)
-						)
-				)
-				.toString();
-		HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> responseEntity = restTemplate.postForEntity(geminiApiUrl, requestEntity, String.class);
-		String responseBody = responseEntity.getBody();
-		JSONObject jsonObject = new JSONObject(responseBody);
-
-		JSONArray candidates = jsonObject.getJSONArray("candidates");
-		JSONObject content = candidates.getJSONObject(0).getJSONObject("content");
-		JSONArray parts = content.getJSONArray("parts");
-		String text = parts.getJSONObject(0).getString("text");
-
-		ApiResponse apiResponse = new ApiResponse();
-		apiResponse.setMessage(text);
-		return apiResponse;
-	}
 }

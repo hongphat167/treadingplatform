@@ -39,3 +39,8 @@ vnpay:
   tmnCode: "R4REM7PT"
   hashSecret: "U22358B7H9M0ICNY8MNRIJVZV3P6I5GM"
   apiUrl: "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction"
+
+gemini:
+  api:
+    key: AIzaSyDnEd8Vq698HHdHqwdbgJk1spybNjrfPwk
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent
